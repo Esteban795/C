@@ -1,16 +1,11 @@
 #include <stdio.h>
-#include <math.h>
 
-double exo2while(int n) {
-    double k = 0.0;
-    double result = 1.0;
-    while  (result < n) {
-        k += 1;
-        result *= 2.0;
-    }
-    return k;
+int main(void) {
+const int nb_livres;
+const int nb_jours;
+scanf("%d %d",&nb_livres,&nb_jours);
+int jours_de_rendus[nb_livres];
+for (int i = 0; i < nb_livres; i++) {
+    jours_de_rendus[i] = i;
 }
-
-void main(void) {
-    printf("%f\n",exo2while(8));
 }
