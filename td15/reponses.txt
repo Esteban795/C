@@ -1,0 +1,77 @@
+Exo 2
+
+
+Q1 : 
+3 arguments
+
+Q2 :
+Hauteur de la pile : 1
+
+Q3  : 
+Hauteur maximale de la pile ligne 22 : 2
+
+Q4  : 
+Hauteur maximale de la pile ligne 22 : 4
+
+Q4  : 
+Hauteur maximale de la pile ligne 22 : 1
+
+
+
+exo 3
+
+Q1 : 
+Début de l'appel pour f(0,_)
+Début de l'appel pour f(1,_)
+Début de l'appel pour f(2,_)
+Fin de l'appel pour f(2,)
+Fin de l'appel pour f(1,)
+Fin de l'appel pour f(0,_)
+
+Q2 : 
+Constantes : 
+printf("*nmax")
+printf("nmax)
+
+
+Différentes 
+n  
+&n
+
+Différentes et imprévisibibles :
+&nmax
+
+
+Q3: 
+Début de l'appel 0
+n = 0
+&n = pointeur
+nmax = pointeur
+*nmax = 2
+&nmax = pointeur
+Début de l'appel 1
+n = 1
+&n = nouveau pointeur
+nmax = même pointeur que précedemment
+*nmax  = 2
+&nmax = nouveau pointeur
+Début de l'appel 2
+n = 2
+&n = encore un nouveau pointeur
+nmax = même même pointeur qu'avant
+*nmax = 2
+&nmax = pointeurencore et toujours nouveau
+Fin de l'appel 2
+Fin de l'appel 1
+Fin de l'appel 0
+
+
+Q4 : 
+32 octets
+
+Exo 4 :
+
+a) problème de type on passe des ints là où il faut des pointeurs
+b) pointeurs de variables locales
+c) correct
+d) pointeurs de variables locales
