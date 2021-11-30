@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-#define ROWS 4000
-#define COLS 4000
+#include <locale.h>
+#define ROWS 500
+#define COLS 500
 
 int arr[ROWS][COLS];
 
@@ -60,6 +60,7 @@ void print_tab(int itermax) {
     }
 }
 int main(void) {
+    setlocale(LC_ALL, "en_US.UTF-8");
     double xmin = -2.;
     double xmax = 2.0;
     double ymin = -2.;
