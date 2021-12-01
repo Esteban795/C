@@ -212,7 +212,7 @@ int pop(int_dynarray* t) {
 
 void insert_at(int_dynarray* t, int i, int x) {
     int l = length(t);
-    assert(i < length(t) && i >= 0);
+    assert(i <= l && i >= 0);
     push(t,x);
     for (int j = l; j > i;j--) {
         set(t,j,get(t,j - 1));
@@ -239,39 +239,45 @@ int position_linear(int_dynarray* t, int x) {
     return i + 1;
 }
 
-int position(int_dynarray* t, int x);
+int position(int_dynarray* t, int x) {
+    int start = 0;
+    int end = length(t);
+    while (end > start) {
+        int mid = start + (end - start) / 2;
+        int elt = get(t,mid);
+        if (elt == x) {
+            return mid;
+        } else if (elt < mid) {
+            end = mid;
+        } else {
+            start = mid + 1;
+        }
+    }
+    return start;
+}
 
 int_dynarray* insertion_sort(int_dynarray* t) {
     int_dynarray* out = make_empty();
+
     int len = length(t);
     for (int i = 0; i < len;i++) {
         int elt = get(t,i);
         int index = position_linear(out,elt);
-        insert_at(t,index,elt);
+        insert_at(out,index,elt);
     }
     return out;
 }
-
-
-
 
 int main(void){
     int_dynarray* dyntab = make_empty();
     push(dyntab,3);
     push(dyntab,2);
     push(dyntab,1);
-    print(dyntab);
     int temp = pop(dyntab);
-    printf("Temp : %d\n",temp);
     insert_at(dyntab,1,4);
-    print(dyntab);
     int temp2 = pop_at(dyntab,1);
-    printf("Temp2 (pop_at : %d) : %d\n",1,temp2);
-    printf("\n\n");
-    print(dyntab);
-    printf("\n\n");
     int_dynarray* sorted_tab = insertion_sort(dyntab);
-    printf("Len sorted tab : %d",length(sorted_tab));
+    print(sorted_tab);
     delete(dyntab);
     delete(sorted_tab); 
     return 0;
