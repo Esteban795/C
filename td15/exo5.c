@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
-#define ROWS 500
-#define COLS 500
+
+#define ROWS 900
+#define COLS 900
 
 int arr[ROWS][COLS];
 
@@ -48,6 +48,13 @@ void print_pixel_bw(int i, int j,int itermax) {
         printf("0 0 0\n");
     }
 }
+void print_pixel_gs(int i, int j, int itermax) {
+    int c  = 255 * arr[i][j] / itermax;
+    for (int i = 0; i < 3; i++) {
+        printf("%d ",c);
+    }
+    printf("\n");
+}
 
 void print_tab(int itermax) {
     printf("P3\n");
@@ -55,17 +62,32 @@ void print_tab(int itermax) {
     printf("255\n");
     for (int i = 0;i < ROWS;i++) {
         for (int j = 0; j < COLS;j++) {
-            print_pixel_bw(i,j,itermax);
+            print_pixel_gs(i,j,itermax);
         }
     }
 }
-int main(void) {
-    setlocale(LC_ALL, "en_US.UTF-8");
-    double xmin = -2.;
-    double xmax = 2.0;
-    double ymin = -2.;
-    double ymax = 2.0;
-    fill_tab(xmin,xmax,ymin,ymax,20);
-    print_tab(20);
+int main(int argc, char* argv[]) {
+    int itermax;
+    double xmin;
+    double xmax;
+    double ymin;
+    double ymax;
+    if (argc == 1) {
+        itermax = 20;
+        xmin = -2.;
+        xmax = 2.0;
+        ymin = -2.;
+        ymax = 2.0;
+    } else if (argc == 2) {
+        itermax = atoi(argv[1]);
+    } else if (argc == 6) {
+        itermax = atoi(argv[1]);
+        xmin = atof(argv[2]);
+        xmax = atof(argv[3]);
+        ymin = atof(argv[4]);
+        ymax = atof(argv[5]);
+    }
+    fill_tab(xmin,xmax,ymin,ymax,itermax);
+    print_tab(itermax);
     return 0;
 }
