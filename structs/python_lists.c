@@ -30,7 +30,7 @@ int_dynarray* make_empty(void) {
     return t;
 }
 
-int_dynarray* make_empty_size(int size) {
+int_dynarray* make_empty_size(int size) { //New dynamic table with an initial size
     int_dynarray* t = make_empty();
     int* data = malloc(sizeof(int) * size);
     (*t).capacity = size;
@@ -56,10 +56,10 @@ void set(int_dynarray* t, int i, int x) {
     }
 }
 
-void resize(int_dynarray* t, int new_capacity) {
+void resize(int_dynarray* t, int new_capacity) { //In case it runs out of memory
     assert((*t).len <= new_capacity);
     int* new_data = malloc(new_capacity * sizeof(int));
-    for (int i = 0; i < (*t).len ;i++) {
+    for (int i = 0; i < (*t).len ;i++) { //Copies previous datas
         new_data[i] = (*t).data[i];
     }
     free((*t).data);
@@ -67,7 +67,7 @@ void resize(int_dynarray* t, int new_capacity) {
     (*t).capacity = new_capacity;   
 }
 
-void delete(int_dynarray* t) {
+void delete(int_dynarray* t) { 
     free((*t).data);
     free(t);
 }
@@ -83,7 +83,7 @@ void print(int_dynarray* t){
 void push(int_dynarray* t, int x) {
     int temp_capacity = (*t).capacity;
     if ((*t).len == temp_capacity) {
-        if (temp_capacity == 0) {
+        if (temp_capacity == 0) { //dynamic tab is empty
             resize(t,1);
         } else {
             resize(t,temp_capacity * 2);
@@ -97,7 +97,7 @@ int pop(int_dynarray* t) {
     assert((*t).len > 0);
     int x = (*t).data[(*t).len - 1];
     (*t).len--;
-    if (2 * (*t).len < (*t).capacity) {
+    if (2 * (*t).len < (*t).capacity) { //To make sure the program uses as little memory as possible
         resize(t,(*t).capacity / 2);
     }
     return x;
@@ -107,7 +107,7 @@ void insert_at(int_dynarray* t, int i, int x) {
     int l = length(t);
     assert(i <= l && i >= 0);
     push(t,x);
-    for (int j = l; j > i;j--) {
+    for (int j = l; j > i;j--) { //Pushes elements to the left
         set(t,j,get(t,j - 1));
     }
     set(t,i,x);
@@ -117,7 +117,7 @@ int pop_at(int_dynarray* t, int i) {
     int l = length(t);
     assert(i < length(t) && i >= 0);
     int temp = get(t,i);
-    for (int k = i; k < l - 1; k++) {
+    for (int k = i; k < l - 1; k++) { //Pushes elements to the right
         set(t, k,get(t,k + 1));
     }
     (*t).len--;
@@ -210,7 +210,7 @@ void extend(int_dynarray* t1, int_dynarray*  t2) {
 }
 
 int main(void){
-    int_dynarray* dyntab1 = make_empty();
+/*     int_dynarray* dyntab1 = make_empty();
     push(dyntab1,1);
     push(dyntab1,2);
     push(dyntab1,3);
@@ -223,6 +223,6 @@ int main(void){
     extend(dyntab1,dyntab2);
     printf("\n\n");
     print(dyntab1);
-    delete(dyntab1);
+    delete(dyntab1); */
     return 0;
 }
