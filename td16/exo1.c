@@ -111,11 +111,27 @@ int length(int_dynarray* t) {
     return (*t).len;
 }
 
+int max(int n1, int n2) {
+    if (n1 > n2) {
+        return n1;
+    }
+    return n2;
+}
+
 int_dynarray* make_empty(void) {
     int_dynarray* t = malloc(sizeof(int_dynarray));
     (*t).data = NULL;
     (*t).capacity = 0;
     (*t).len = 0;
+    return t;
+}
+
+int_dynarray* make_empty_size(int size) {
+    int_dynarray* t = malloc(sizeof(int_dynarray));
+    int* data = malloc(size * sizeof(int));
+    (*t).capacity = size;
+    (*t).len = 0;
+    (*t).data = data;
     return t;
 }
 
@@ -268,17 +284,47 @@ int_dynarray* insertion_sort(int_dynarray* t) {
     return out;
 }
 
+int_dynarray* copy(int_dynarray* t) {
+    int l = length(t);
+    int_dynarray* out = make_empty_size(l);
+    for (int i = 0; i < l; i++) {
+        set(out,i,get(t,i));
+    }
+    return out;
+}
+
+int count(int_dynarray* t,int element) {
+    int count = 0;
+    for (int i = 0; i < length(t); i++) {
+        if (get(t,i) == element) {
+            count++;
+        }
+    }
+    return count;
+}
+
+void extend(int_dynarray* t1, int_dynarray* t2) {
+    int l1 = length(t1);
+    int l2 = length(t2);
+    (*t1).data = (int*) realloc((*t1).data,max(l1 + l2,2*l1));
+    assert((*t1).data != NULL);
+    for (int j = l1; j < l1 + l2;j++) {
+        set(t1,j,get(t2,j - l1));
+    }
+    delete(t2);
+}
+
+
 int main(void){
     int_dynarray* dyntab = make_empty();
     push(dyntab,3);
     push(dyntab,2);
     push(dyntab,1);
-    int temp = pop(dyntab);
-    insert_at(dyntab,1,4);
-    int temp2 = pop_at(dyntab,1);
-    int_dynarray* sorted_tab = insertion_sort(dyntab);
-    print(sorted_tab);
-    delete(dyntab);
-    delete(sorted_tab); 
+    int_dynarray* dyntab2 = make_empty();
+    push(dyntab,3);
+    push(dyntab,2);
+    push(dyntab,1);
+    extend(dyntab,dyntab2);
+    print(dyntab);
     return 0;
 }
