@@ -472,16 +472,55 @@ void test_queue(void){
   free_queue(q);
 }
 
-/*
+
 // Exercice 8
 
-int *hamming(int n);
+int minimum(int a, int b){
+  if (a <= b) return a;
+  return b;
+}
+
+int* hamming(int n){
+  int* t = malloc(sizeof(int) * n);
+  queue* f2 = empty_queue();
+  queue* f3 = empty_queue();
+  queue* f5 = empty_queue();
+  push_right(f2,1);
+  push_right(f3,1);
+  push_right(f5,1);
+  for (int i = 0; i < n; i++){
+    int elt2 = peek_left(f2);
+    int elt3 = peek_left(f3);
+    int elt5 = peek_left(f5);
+    int mini = minimum(minimum(elt2,elt3),elt5);
+    t[i] = mini;
+    if (elt2 == mini){
+      pop_left(f2);
+    }
+    if (elt3 == mini){
+      pop_left(f3);
+    }
+    if (elt5 == mini){
+      pop_left(f5);
+    }
+    push_right(f5,5 * mini);
+    if (mini % 5 != 0){
+      push_right(f3,3 * mini);
+      if (mini % 3 != 0){
+        push_right(f2,2 * mini);
+      }
+    }
+  }
+  free(f2);
+  free(f3);
+  free(f5);
+  return t;
+}
 
 void test_hamming(void){
   int n = 14;
   int h_ref[14] = {1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20};
   int *h = hamming(14);
-
   for (int i = 0; i < n; i++){
     assert(h[i] == h_ref[i]);
   }
@@ -491,9 +530,28 @@ void test_hamming(void){
 
 // Exercice 9
 
-node *insert_it(node *u, datatype x);
+node* insert_it(node *u, datatype x){
+  if (u == NULL || u->data == x) {return cons(u,x);}
+  node* current = u;
+  while (current != NULL) {
+    if (current->next != NULL && current->next->data < x){
+      current = current->next;
+    } else {
+      current->next = cons(current->next,x);
+      break;
+    }
+  }
+  return u;
+}
 
-node *insertion_sort_it(node *u);
+node* insertion_sort_it(node *u){
+  node* temp = NULL;
+  while (u != NULL){
+    temp = insert_it(temp,u->data);
+    u = u->next;
+  }
+  return temp;
+}
 
 void test_insertion_sort_it(void){
   int t[5] = {0, 4, 2, 1, 3};
@@ -502,7 +560,6 @@ void test_insertion_sort_it(void){
   node *u = from_array(t, 5);
   node *v = insertion_sort_it(u);
   node *w = from_array(t_sorted, 5);
-
   assert(is_equal(v, w));
 
   free_list(u);
@@ -512,7 +569,7 @@ void test_insertion_sort_it(void){
 
 
 // Exercice 10
-
+/*
 node *split(node *u, int n);
 
 void test_split(void);
@@ -532,8 +589,8 @@ void test_merge_sort(void){
   free_list(u);
   free_list(u_sorted);
 }
-
 */
+
 
 int main(void) {
   test_length();
@@ -548,5 +605,7 @@ int main(void) {
   test_reverse();
   test_stack();
   test_queue();
+  test_hamming();
+  test_insertion_sort_it();
   return 0;
 }
