@@ -12,4 +12,7 @@ double exo2while(int n) {
 }
 
 void main(void) {
-    printf("%f\n",exo2while(8));
+    int n;
+    scanf("%d",&n);
+    printf("%f\n",exo2while(n));
+}
