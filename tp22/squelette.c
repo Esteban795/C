@@ -569,14 +569,53 @@ void test_insertion_sort_it(void){
 
 
 // Exercice 10
-/*
-node *split(node *u, int n);
 
-void test_split(void);
+node *split(node *u, int n){
+  node* v = u;
+  while (n > 1) {
+    assert(v != NULL);
+    n--;
+    v = v->next;
+  }
+  assert(v != NULL);
+  node* temp = v->next;
+  v->next = NULL;
+  return temp;
+}
 
-node *merge(node *u, node *v);
+node *merge(node *u, node *v){
+  if (u == NULL) { return v; }
+  if (v == NULL) { return u; }
+  node *res = NULL;
+  if (u->data <= v->data){
+  res = u;
+  u = u->next;
+  } else {
+  res = v;
+  v = v->next;
+  }
+  node *current = res;
+  while (u != NULL || v != NULL){
+    if (v == NULL || (u != NULL && u->data <= v->data)){
+    current->next = u;
+    u = u->next;
+      current = current->next;
+    } else {
+      current->next = v;
+      v = v->next;
+      current = current->next;
+    }
+  }
+  return res;
+}
 
-node *merge_sort(node *u);
+node *merge_sort(node *u){
+  int n = length(u);
+  if (n < 2) {return u;}
+  node* snd = merge_sort(split(u,n/2));
+  node* fst = merge_sort(u);
+  return merge(fst,snd);
+}
 
 void test_merge_sort(void){
   int t[10] = {1, 4, 0, 2, 3, 8, 5, 6, 6, 7};
@@ -589,7 +628,7 @@ void test_merge_sort(void){
   free_list(u);
   free_list(u_sorted);
 }
-*/
+
 
 
 int main(void) {
@@ -607,5 +646,6 @@ int main(void) {
   test_queue();
   test_hamming();
   test_insertion_sort_it();
+  test_merge_sort();
   return 0;
 }
