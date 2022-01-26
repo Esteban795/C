@@ -55,6 +55,70 @@ item bst_minimum(bst* t){
     return temp->key;
 }
 
+bst* bst_insert(bst* t, item x){
+    if (t == NULL) return new_node(x);
+    bst* current = t;
+    while (true) {
+        item y = current->key;
+        if (x == y) return t;
+        if (x < y && current->left == NULL) {
+            current->left = new_node(x);
+            return t;
+        } else if (x < y){
+            current = current->left;
+        }
+        if (x > y && current->right == NULL){
+            current->right = new_node(x);
+            return t;
+        } else {
+            current = current->right;
+        }
+    }
+}
+
+bst* build(item t[],int len) {
+    bst* tree = NULL;
+    for (int i = 0; i < len; i++) {
+        tree = bst_insert(tree,t[i]);
+    }
+    return tree;
+}
+
+bst* delete_min(bst* t){
+    if (t == NULL) return t;
+    while (t->left != NULL){
+        bst* temp = t;
+        t = t->left;
+        free(temp);
+    }
+    return t->right;
+}
+
+bst* delete(bst* t,item x){
+    if (t == NULL) return NULL;
+    if (t->key < x){ /*moving through the bst */
+        t->right = delete(t->right,x);
+        return t;
+    }
+    if (t->key > x){
+        t->left = delete(t->left,x);
+        return t;
+    }
+    if (t->left == NULL){ /*t->key == NULL */
+        bst* temp = t->right;
+        free(t);
+        return temp;
+    }
+    if (t->right == NULL){
+        bst* temp = t->left;
+        free(t);
+        return temp;
+    }
+    item min = bst_minimum(t);
+    t->right = delete_min(t->right);
+    t->key = min;
+    return t;
+}
 
 int main(void){
     return 1;
