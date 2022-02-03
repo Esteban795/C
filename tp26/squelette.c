@@ -166,15 +166,64 @@ node* node_extract_min(node* n, int *min_ptr){
 }
 
 node* node_delete(node* n,item x){
-    
+    if (n == NULL) return NULL;
+    if (n->key < x){ /*moving through the bst */
+        n->right = node_delete(n->right,x);
+        return n;
+    }
+    if (n->key > x){
+        n->left = node_delete(n->left,x);
+        return n;
+    }
+    if (n->left == NULL){ /*n->key == NULL */
+        bst* temp = n->right;
+        free(n);
+        return temp;
+    }
+    if (n->right == NULL){
+        bst* temp = n->left;
+        free(n);
+        return temp;
+    }
+    item min = bst_minimum(n);
+    n->right = delete_min(n->right);
+    n->key = min;
+    return n;
 }
 
-int main(void){
-    int len;
-    int min_arbre;
-    item tab[5] = {3,2,1,4,5};
-    bst* t = bst_from_array(tab,5);
-    
-    bst_free(t);
+int rand_between(int lo, int hi){
+    int x = rand();
+    return lo + x % (hi - lo);
+}
+
+void shuffle(item arr[], int len){
+    assert(len < RAND_MAX);
+    for (int i = 0; i < len; i++){
+        int j = rand_between(i, len);
+        item tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+    }
+}
+
+int fast_expo(int val,int expo) {
+    if (expo == 0) return 1;
+    if (expo % 2 == 0) return fast_expo(val * val,expo/2);
+    else val * fast_expo(val * val,expo/2);
+}
+
+int main(int argc,char* argv){
+    int max_power = atoi(argv[1]);
+    int rep_count = atoi(argv[2]);
+    for (int i = 4; i < max_power;i++){
+        for (int j = 0; j < rep_count;j++) {
+            int len = fast_expo(2,i);
+            int* t = malloc(sizeof(int) * len);
+            shuffle(t,len);
+            bst* new_bst = bst_from_array(t,len);
+            int hauteur = bst_height(new_bst);
+            printf("%d %d",len,hauteur);
+        }
+    }
     return 0;
 }
