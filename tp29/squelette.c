@@ -57,7 +57,7 @@ void image_save(image *im, char *filename){
 image *image_new(int h, int w){
     image* img = malloc(sizeof(image));
     img->at = malloc(h * sizeof(uint8_t*));
-    for (int i = 0; i < w;i++) {
+    for (int i = 0; i < h;i++) {
         img->at[i] = malloc(w * sizeof(int8_t));
     }
     img->h = h;
@@ -73,9 +73,9 @@ void image_delete(image *im){
     free(im);
 }
 
-void invert(image *im){
-    for (int i = 0; i < im->h;i++) {
-        for (int j = 0;j < im->w;j++) {
+void invert(image *im) {
+    for(int i = 0; i < im->h; i++) {
+        for(int j = 0; j < im->w; j++) {
             im->at[i][j] = 255 - im->at[i][j];
         }
     }
@@ -219,8 +219,8 @@ void reduce_one_column(image *im, energy *e){
     compute_energy(im,e);
     int j_min = best_column(e);
     for (int i = 0; i < im->h; i++){
-        for (int j = j_min; j < im->w - 1;j++){
-            im->at[i][j] = im->at[i][j];
+        for (int j = j_min; j < im->w - 1;++j){
+            im->at[i][j] = im->at[i][j + 1];
         }
     }
     im->w--;
@@ -243,7 +243,7 @@ void energy_min_path(energy *e){
             int jr = (j < e->w - 1) ? j + 1 : j;
             int jl = (j > 0) ? j - 1 : j;
             double energy_min = e->at[i - 1][jl];
-            for (int k = jl; k <= jr;k++) {
+            for (int k = jl + 1; k <= jr;k++) {
                 if (e->at[i - 1][k] < energy_min) {
                     energy_min = e->at[i - 1][k];
                 }
@@ -265,6 +265,7 @@ void path_delete(path *p){
     free(p);
 }
 
+
 void compute_min_path(energy *e, path *p){
     int h = e->h;
     int j_min = 0;
@@ -280,7 +281,7 @@ void compute_min_path(energy *e, path *p){
     for (int i = h - 2; i >= 0;i--) {
         int jr = (j < e->w - 1) ? j + 1 : j;
         int jl = (j > 0) ? j - 1 : j;
-        double energy_min = e->at[i - 1][jl];
+        e_min = e->at[i][jl];
         j_min = jl;
         for (int k = jl + 1; k <= jr;k++){
             if (e->at[i][k] < e_min) {
@@ -295,13 +296,13 @@ void compute_min_path(energy *e, path *p){
 
 void reduce_seam_carving(image *im, int n){
     energy* e = energy_new(im->h,im->w);
-    path* p = path_new(n);
+    path* p = path_new(im->h);
     for (int k = 0; k < n; k++){
         compute_energy(im,e);
         energy_min_path(e);
         compute_min_path(e,p);
         for (int i = 0; i < im->h;i++){
-            for (int j = p->at[i]; j < im->w - 1;j++) {
+            for (int j = p->at[i]; j < im->w - 1;++j) {
                 im->at[i][j] = im->at[i][j + 1];
             }
         }
