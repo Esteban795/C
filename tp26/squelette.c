@@ -185,9 +185,7 @@ node* node_delete(node* n,item x){
         free(n);
         return temp;
     }
-    item min = bst_minimum(n);
-    n->right = delete_min(n->right);
-    n->key = min;
+    n->right = node_extract_min(n,n->key);
     return n;
 }
 
