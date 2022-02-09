@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 typedef int datatype;
 
@@ -92,7 +93,7 @@ heap* heapify(int size,datatype arr[]){
 void heapsort(datatype arr[],int size){
     heap* h = heapify(size,arr);
     for (int i = 0; i < size;i++){
-        arr[i] = extract_min(h);
+        extract_min(h);
     }
     free(h);
 }
