@@ -77,3 +77,18 @@ node* delete(node* root,char* string,int depth){//Bottom to top
     }
     return root;
 }
+
+void _delete_subtrie(node* root){
+    if (root == NULL) return;
+    for (int i = 0; i < ALPHABET_SIZE;i++){
+        if (root->children[i] != NULL){
+            _delete_subtrie(root->children[i]);
+        }
+    }
+    free(root);
+}
+
+void delete_trie(node* root){
+    if (root == NULL) return;
+    _delete_subtrie(root);
+}
