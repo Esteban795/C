@@ -23,27 +23,29 @@ node* new_node(){
 }
 
 void insert(node* root,char* string){
-    int len = strlen(string);
+    int level = 0;
     node* current = root;
-    for (int level = 0; level < len; level++){
+    while (string[level]){
         int index = char_to_index(string[level]);
         if (current->children[index] == NULL){
             current->children[index] = new_node();
-        }
+        } 
         current = current->children[index];
+        level++;
     }
     current->is_word = true;
 }
 
 bool search(node* root,char* string){
-    int len = strlen(string);
+    int level = 0;
     node* current = root;
-    for (int level = 0; level < len; level++){
+    while (string[level]){
         int index = char_to_index(string[level]);
         if (current->children[index] == NULL){
-            return false;
-        }
+            return NULL;
+        } 
         current = current->children[index];
+        level++;
     }
     return (current->is_word);
 }
@@ -57,9 +59,7 @@ bool has_children(node* root){
 
 node* delete(node* root,char* string,int depth){//Bottom to top
     if (root == NULL) return NULL;
-    int len = strlen(string);
-    depth = depth ? depth : 0; //Default value ??
-    if (depth == len) {
+    if (string[depth] == 0) {
         if (root->is_word) {
             root->is_word = false;
         }
@@ -91,4 +91,9 @@ void _delete_subtrie(node* root){
 void delete_trie(node* root){
     if (root == NULL) return;
     _delete_subtrie(root);
+}
+
+
+int main(void){
+    
 }
