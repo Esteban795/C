@@ -95,12 +95,12 @@ int trie_size(trie* t){
 ////////////////////////////////////////////////
 
 
-bool insert(node* root,char* prefixing){
+bool insert(node* root,char* prefix){
     int level = 0;
     node* current = root;
     bool size_increased = false;
-    while (prefixing[level]){
-        int index = char_to_index(prefixing[level]);
+    while (prefix[level]){
+        int index = char_to_index(prefix[level]);
         if (current->children[index] == NULL){
             current->children[index] = new_node();
             size_increased = true;
@@ -119,11 +119,11 @@ void trie_insert(trie* t,char* word){
 
 
 
-bool search(node* root,char* prefixing){
+bool search(node* root,char* prefix){
     int level = 0;
     node* current = root;
-    while (prefixing[level]){
-        int index = char_to_index(prefixing[level]);
+    while (prefix[level]){
+        int index = char_to_index(prefix[level]);
         if (current->children[index] == NULL){
             return false;
         } 
@@ -165,7 +165,7 @@ node* node_delete_word(node* root,char* string,int depth,bool* word_found){//Bot
     }
     int index = char_to_index(string[depth]); 
     root->children[index] = node_delete_word(root->children[index],string,depth + 1,word_found); //moving through the trie
-    if (!has_children(root) && root->is_word == false){ //single node with no children 
+    if (!has_children(root) && root->is_word == false){ //node with no children 
         free(root);                                       //and doesn't belong to another word
         root = NULL;
 
@@ -186,7 +186,7 @@ void node_elements(node* n,int level,char str[],char** tab,int* j){
         str[level] = 0; //zero terminated string
         char* temp = char_deepcopy(str,level + 1);
         tab[*j] = temp;
-        *j = *j + 1;
+        (*j)++;
     }
     for (int i = 0; i < ALPHABET_SIZE;i++){
         if (n->children[i]){ // children exists, we go deeper in the tree;
@@ -220,17 +220,17 @@ void delete_trie(trie* t){
     free(t);
 }
 
-void delete_chartab(chartab* t){
-    for (int i = 0; i < t->size; i++){
-        free(t->tab[i]);
+void delete_chartab(chartab* ct){
+    for (int i = 0; i < ct->size; i++){
+        free(ct->tab[i]);
     }
-    free(t->tab);
-    free(t);
+    free(ct->tab);
+    free(ct);
 }
 
 void print_trie(trie* t){
     chartab* ct = trie_elements(t);
-    for (int i = 0; i < t->size;i++){
+    for (int i = 0; i < ct->size;i++){
         printf(ct->tab[i]);
         printf("\n");
     }
