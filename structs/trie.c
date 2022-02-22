@@ -11,6 +11,15 @@ int max(int a, int b){
     return a;
 }
 
+char* char_deepcopy(char* str,int size){
+    char* temp = malloc(sizeof(char) * size);
+    for (int i = 0;i < size;i++){
+        temp[i] = str[i];
+    }
+    return temp;
+}
+
+
 struct TrieNode{
     struct TrieNode* children[ALPHABET_SIZE];
     bool is_word;
@@ -25,6 +34,12 @@ struct Trie{
 
 typedef struct Trie trie;
 
+struct CharTab{
+    char** tab;
+    int size;
+};
+
+typedef struct CharTab chartab;
 
 int char_to_index(char c){
     return ((int)c - (int)'a');
@@ -39,6 +54,7 @@ node* new_node(){
     return tn;
 }
 
+
 trie* new_trie(void){
     trie* t = malloc(sizeof(trie));
     t->root = new_node();
@@ -46,125 +62,14 @@ trie* new_trie(void){
     return t;
 }
 
-bool insert(node* root,char* string){
-    int level = 0;
-    node* current = root;
-    bool size_increased = false;
-    while (string[level]){
-        int index = char_to_index(string[level]);
-        if (current->children[index] == NULL){
-            current->children[index] = new_node();
-            size_increased = true;
-        } 
-        current = current->children[index];
-        level++;
-    }
-    current->is_word = true;
-    return size_increased;
+chartab* new_chartab(int size){
+    chartab* ct = malloc(sizeof(chartab));
+    ct->tab = malloc(sizeof(char*) * size);
+    ct->size = size;
+    return ct;
 }
 
-void trie_insert(trie* t,char* word){
-    bool size_increased = insert(t->root,word);
-    t->size += size_increased ? 1 : 0;
-}
-
-bool search(node* root,char* string){
-    int level = 0;
-    node* current = root;
-    while (string[level]){
-        int index = char_to_index(string[level]);
-        if (current->children[index] == NULL){
-            return false;
-        } 
-        current = current->children[index];
-        level++;
-    }
-    return (current->is_word);
-}
-
-bool trie_search(trie* t,char* word){
-    return search(t->root,word);
-}
-
-bool has_children(node* root){
-    for (int i = 0; i < ALPHABET_SIZE;i++){
-        if (root->children[i] != NULL) return true;
-    }
-    return false;
-}
-
-node* _delete_word(node* root,char* string,int depth,bool* word_found){//Bottom to top
-    if (root == NULL){
-        *word_found = false;
-        return NULL;
-    } 
-    if (string[depth] == 0) {
-        if (root->is_word) {
-            root->is_word = false;
-        }
-        if (!has_children(root)){
-            free(root);
-            root = NULL;
-        }
-        
-        return root;
-    }
-    int index = char_to_index(string[depth]); 
-    root->children[index] = _delete_word(root->children[index],string,depth + 1,word_found); //moving through the trie
-    if (!has_children(root) && root->is_word == false){ //single node with no children 
-        free(root);                                       //and doesn't belong to another word
-        root = NULL;
-
-    }
-    return root;
-}
-
-
-void node_elements(node* n,int level,char str[]){
-    if (n->is_word){
-        str[level] = 0; //zero terminated string
-        printf(str);
-        printf("\n");
-    }
-    for (int i = 0; i < ALPHABET_SIZE;i++){
-        if (n->children[i]){ // children exists, we go deeper in the tree;
-            str[level] = i + 'a'; //adds correct letter to the string
-            node_elements(n->children[i],level + 1,str);
-        }
-    }
-}
-
-void trie_elements(trie* t){
-    char str[35];
-    node_elements(t->root,0,str);
-}
-
-void delete_word(trie* t,char* word){
-    assert(t != NULL);
-    bool word_exists = true;
-    _delete_word(t->root,word,0,&word_exists);
-    t->size += word_exists ? -1 : 0;
-}
-
-void delete_node(node* root){
-    if (root == NULL) return;
-    for (int i = 0; i < ALPHABET_SIZE;i++){
-        if (root->children[i] != NULL){
-            delete_node(root->children[i]);
-        }
-    }
-    free(root);
-}
-
-void delete_trie(trie* t){
-    delete_node(t->root);
-    free(t);
-}
-
-int trie_size(trie* t){
-    return t->size;
-}
-
+/* Size anf height */
 int node_height(node* n){
     if (n == NULL) return -1;
     int h = 0;
@@ -183,6 +88,154 @@ int trie_height(trie* t){
     return node_height(t->root);
 }
 
+int trie_size(trie* t){
+    return t->size;
+}
+
+////////////////////////////////////////////////
+
+
+bool insert(node* root,char* prefixing){
+    int level = 0;
+    node* current = root;
+    bool size_increased = false;
+    while (prefixing[level]){
+        int index = char_to_index(prefixing[level]);
+        if (current->children[index] == NULL){
+            current->children[index] = new_node();
+            size_increased = true;
+        } 
+        current = current->children[index];
+        level++;
+    }
+    current->is_word = true;
+    return size_increased;
+}
+
+void trie_insert(trie* t,char* word){
+    bool size_increased = insert(t->root,word);
+    t->size += size_increased ? 1 : 0;
+}
+
+
+
+bool search(node* root,char* prefixing){
+    int level = 0;
+    node* current = root;
+    while (prefixing[level]){
+        int index = char_to_index(prefixing[level]);
+        if (current->children[index] == NULL){
+            return false;
+        } 
+        current = current->children[index];
+        level++;
+    }
+    return (current->is_word);
+}
+
+bool trie_search(trie* t,char* word){
+    return search(t->root,word);
+}
+
+
+
+
+bool has_children(node* root){
+    for (int i = 0; i < ALPHABET_SIZE;i++){
+        if (root->children[i] != NULL) return true;
+    }
+    return false;
+}
+
+node* node_delete_word(node* root,char* string,int depth,bool* word_found){//Bottom to top
+    if (root == NULL){
+        *word_found = false;
+        return NULL;
+    } 
+    if (string[depth] == 0) {
+        if (root->is_word) {
+            root->is_word = false;
+        }
+        if (!has_children(root)){
+            free(root);
+            root = NULL;
+        }
+        
+        return root;
+    }
+    int index = char_to_index(string[depth]); 
+    root->children[index] = node_delete_word(root->children[index],string,depth + 1,word_found); //moving through the trie
+    if (!has_children(root) && root->is_word == false){ //single node with no children 
+        free(root);                                       //and doesn't belong to another word
+        root = NULL;
+
+    }
+    return root;
+}
+
+void trie_delete_word(trie* t,char* word){
+    assert(t != NULL);
+    bool word_exists = true;
+    node_delete_word(t->root,word,0,&word_exists);
+    t->size += word_exists ? -1 : 0;
+}
+
+
+void node_elements(node* n,int level,char str[],char** tab,int* j){
+    if (n->is_word){
+        str[level] = 0; //zero terminated string
+        char* temp = char_deepcopy(str,level + 1);
+        tab[*j] = temp;
+        *j = *j + 1;
+    }
+    for (int i = 0; i < ALPHABET_SIZE;i++){
+        if (n->children[i]){ // children exists, we go deeper in the tree;
+            str[level] = i + 'a'; //adds correct letter to the string
+            node_elements(n->children[i],level + 1,str,tab,j);
+        }
+    }
+}
+
+chartab* trie_elements(trie* t){
+    const int height = trie_height(t);
+    char prefix[height + 1];
+    int index = 0;
+    chartab* ct = new_chartab(t->size);
+    node_elements(t->root,0,prefix,ct->tab,&index);
+    return ct;
+}
+
+void delete_node(node* root){
+    if (root == NULL) return;
+    for (int i = 0; i < ALPHABET_SIZE;i++){
+        if (root->children[i] != NULL){
+            delete_node(root->children[i]);
+        }
+    }
+    free(root);
+}
+
+void delete_trie(trie* t){
+    delete_node(t->root);
+    free(t);
+}
+
+void delete_chartab(chartab* t){
+    for (int i = 0; i < t->size; i++){
+        free(t->tab[i]);
+    }
+    free(t->tab);
+    free(t);
+}
+
+void print_trie(trie* t){
+    chartab* ct = trie_elements(t);
+    for (int i = 0; i < t->size;i++){
+        printf(ct->tab[i]);
+        printf("\n");
+    }
+    delete_chartab(ct);
+}
 
 int main(void){
     trie* t = new_trie();
@@ -195,17 +248,12 @@ int main(void){
     assert(trie_search(t, "ab"));
     assert(!trie_search(t, "a"));
     assert(!trie_search(t, "testb"));
-    delete_word(t,"test");
-    delete_word(t,"ab");
+    print_trie(t);
+    trie_delete_word(t,"test");
+    trie_delete_word(t,"ab");
     assert(!trie_search(t,"test"));
-    printf("Trie size is : %d\n",trie_size(t));
-    printf("\n");
-    trie_elements(t);
-    printf("Trie height is : %d",trie_height(t));
-    printf("\n");
-    delete_word(t,"intergouvernementalisations");
-    printf("Trie height is now  : %d",trie_height(t));
-    printf("\n");
+    printf("\n\n\n\n");
+    print_trie(t);
     delete_trie(t);
     return 0;
 }
