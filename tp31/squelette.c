@@ -178,30 +178,7 @@ void set_remove(set* s,T x){
     s->a[j].status = tombstone;
 }
 
-
-/*
-set *set_example() {
-    set *s = malloc(sizeof(set));
-    s->p = 2;
-    s->a = malloc(4 * sizeof(bucket));
-    s->a[0].status = occupied;
-    s->a[0].element = 1492;
-    s->a[1].status = occupied;
-    s->a[1].element = 1939;
-    s->a[2].status = empty;
-    s->a[3].status = occupied;
-    s->a[3].element = 1515;
-    s->nb_empty = 1;
-    return s;
-}
-*/
-
-
-
-
-
-/*
-uint32_t *read_data(char *filename, int *n) {
+uint32_t *read_data(char *filename, int *n) { //provided function
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         return NULL;
@@ -232,7 +209,36 @@ uint32_t *read_data(char *filename, int *n) {
     *n = nb_lines;
     return t;
 }
-*/
+
+set* read_set(char* filename){
+    int size = 0;
+    T* data = read_data(filename,&size);
+    set* s = set_new();
+    assert(data != NULL);
+    for (int i = 0; i < size; i++){
+        set_add(s,data[i]);
+    }
+    free(data);
+    return s;
+}
+
+void set_skip_stats(set* s, double* average,uint64_t* max){
+    uint64_t skip_total = 0;
+    uint64_t skip_max = 0;
+    uint64_t nb_elts = 0;
+    for (uint64_t i = new_set_begin(s);i != set_end(s); i = set_next(s,i)){
+        nb_elts++;
+        uint32_t ip = set_get(s,i);
+        uint64_t index = hash(ip,s->p);
+        uint64_t nb_index_skip = (i - index) & ones(s->p);
+        skip_total += nb_index_skip;
+        if (skip_total > skip_max){
+            skip_max = skip_total;
+        }
+    }
+    *average = (double)skip_total / nb_elts;
+    *max = skip_max;
+}
 
 
 int main() {
