@@ -240,6 +240,10 @@ void set_skip_stats(set* s, double* average,uint64_t* max){
     *max = skip_max;
 }
 
+uint64_t hash2(uint32_t x, int p){
+    uint64_t temp = 11400714819323198549u;
+    return (x * temp) >> (64 - p);
+}
 
 int main() {
     set* s = set_new();    
