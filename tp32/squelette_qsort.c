@@ -136,6 +136,51 @@ void siftdown(int* arr,int i, int len){
         siftdown(arr,index_min,len);
     }
 }
+
+void extract_max(int* arr,int len){
+    swap(arr,0,len - 1);
+    siftdown(arr,0,len - 1);
+}
+
+int heapify(int* tab,int len){
+    for (int i = (len - 1)/2; i >= 0; i--){
+        siftdown(tab,i,len);
+    }
+}
+
+void heapsort(int* arr,int len){
+    heapify(arr,len);
+    for (int i = 0; i < len;i++){
+        extract_max(arr,len);
+    }
+}
+
+int ilog(int n){
+    int i = 0;
+    while (n > 1){
+        i++;
+        n = n/2;
+    }
+    return i;
+}
+
+void introsort_aux(int* arr, int len,int max_height){
+    if (len <= 1) return;
+    if (max_height < 0){
+        heapsort(arr,len);
+    } else {
+        int k = partition(arr,len);
+        introsort_aux(&arr[k + 1],len - k - 1,max_height - 1);
+        introsort_aux(arr,k,max_height - 1);
+    }
+}
+
+void introsort(int* arr,int len){
+    int max_height = 2 * ilog(len) + 1; 
+    introsort_aux(arr,len,max_height);
+}
+
+
 int main(void){
     test_quicksort(10,3,1000);
     return 0;
