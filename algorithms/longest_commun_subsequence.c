@@ -3,6 +3,14 @@
 #include <assert.h>
 
 
+/*
+Relation de récurrence : 
+
+- c[i][j] = 0 si i = 0 ou j = 0;
+- c[i][j] = 1 + c[i - 1][j - 1] si x[i] = y[j] 
+- c[i][j] = max(c[i - 1][j], c[i][j - 1])
+*/
+
 int max(int a,int b){
     if (a >= b) return a;
     return b;
