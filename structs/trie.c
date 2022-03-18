@@ -99,11 +99,11 @@ bool insert(node* root,char* prefix){
     int level = 0;
     node* current = root;
     bool size_increased = false;
-    while (prefix[level]){
+    while (prefix[level]){ //string not empty
         int index = char_to_index(prefix[level]);
         if (current->children[index] == NULL){
             current->children[index] = new_node();
-            size_increased = true;
+            size_increased = true; //to make sure size stays accurate
         } 
         current = current->children[index];
         level++;
