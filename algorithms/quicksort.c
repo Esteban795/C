@@ -9,7 +9,7 @@ void swap(int* arr,int i,int j) {
     arr[j] = temp;
 }
 
-int partition(int* arr, int start, int end, int index_pivot){
+int partition(int* arr, int start, int end, int index_pivot){ //everything left to ipivot has a lower value than value_pivot, right for higher values.
     assert(arr != NULL);
     int value_pivot = arr[index_pivot];
     swap(arr,index_pivot,end - 1);

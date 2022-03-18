@@ -60,8 +60,8 @@ bst* bst_insert(bst* t, item x){
     bst* current = t;
     while (true) {
         item y = current->key;
-        if (x == y) return t;
-        if (x < y && current->left == NULL) {
+        if (x == y) return t; //item already exists
+        if (x < y && current->left == NULL) { 
             current->left = new_node(x);
             return t;
         } else if (x < y){
@@ -76,7 +76,7 @@ bst* bst_insert(bst* t, item x){
     }
 }
 
-bst* build(item t[],int len) {
+bst* build(item t[],int len) { //builds a bst from an array
     bst* tree = NULL;
     for (int i = 0; i < len; i++) {
         tree = bst_insert(tree,t[i]);
@@ -84,7 +84,7 @@ bst* build(item t[],int len) {
     return tree;
 }
 
-bst* delete_min(bst* t){
+bst* delete_min(bst* t){ 
     if (t == NULL) return t;
     while (t->left != NULL){
         bst* temp = t;
@@ -94,7 +94,7 @@ bst* delete_min(bst* t){
     return t->right;
 }
 
-bst* delete(bst* t,item x){
+bst* delete(bst* t,item x){ //fully deletes a bst
     if (t == NULL) return NULL;
     if (t->key < x){ /*moving through the bst */
         t->right = delete(t->right,x);

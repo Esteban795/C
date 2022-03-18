@@ -151,7 +151,6 @@ int position(int_dynarray* t, int x) {
 
 int_dynarray* insertion_sort(int_dynarray* t) {
     int_dynarray* out = make_empty();
-
     int len = length(t);
     for (int i = 0; i < len;i++) {
         int elt = get(t,i);
