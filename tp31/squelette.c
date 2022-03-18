@@ -161,7 +161,7 @@ uint64_t new_set_search(set* s,T x,bool* found){
 
 uint64_t new_set_next(set* s,uint64_t i){
     i++;
-    while (i < (1ull << s->p) && (s->a[i].status == empty || s->a[i].status == empty)) {
+    while (i < (1ull << s->p) && (s->a[i].status == empty || s->a[i].status == tombstone)) {
         i++;
     }
     return i;
