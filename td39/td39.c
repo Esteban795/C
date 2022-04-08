@@ -97,7 +97,7 @@ bool **closure(bool **a, int n){
 void explore(bool** m,int n,int i, bool* seen) {
     seen[i] = true;
     for (int j = 0; j < n;j++) {
-        if (m[i][j] && !seen[i) explore(m,n,j,seen);
+        if (m[i][j] && !seen[j]) explore(m,n,j,seen);
     }
 }
 
@@ -110,9 +110,20 @@ bool *accessible(bool **a, int n, int i){
     return seen;
 }
 
-bool **closure_dfs(bool **a, int n);
+bool **closure_dfs(bool **a, int n){
+    bool** matrix_access = malloc(sizeof(bool*) * n);
+    for (int i = 0; i < n;i++){
+        matrix_access[i] = accessible(a,n,i);
+    }
+    return matrix_access;
+}
 
-bool is_axiom(bool **b, int n, int i);
+bool is_axiom(bool **b, int n, int i){
+    for (int j = 0; j < n;j++){
+        if (b[j][i] && !b[i][j]) return false;
+    }
+    return true;
+}
 
 bool *axiom_system(bool **b, int n);
 
@@ -126,10 +137,11 @@ void print_system(bool *system, int n){
 int main(void){
     int n;
     bool** m = read_data(&n);
-    matrix_print(m,n,n);
     bool** t = closure(m,n);
     printf("\n\n\n");
     matrix_print(t,n,n);
+    printf("\n\n\n");
+    printf("x1 est un axiome %d",is_axiom(t,n,1));
     matrix_free(m,n);
     matrix_free(t,n);
     return 0;
