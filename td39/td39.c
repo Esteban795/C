@@ -125,7 +125,22 @@ bool is_axiom(bool **b, int n, int i){
     return true;
 }
 
-bool *axiom_system(bool **b, int n);
+bool *axiom_system(bool **b, int n){
+    bool* s = malloc(sizeof(bool) * n);
+    for (int i = 0; i < n; i++){
+        s[i] = true;
+    }
+    for (int i = 0; i < n;i++){
+        if (s[i] && is_axiom(b,n,i)){
+            for (int j = i + 1; j < n;j++){
+                if (b[i][j]) s[j] = false;
+            }
+        } else {
+            s[i] = false;
+        }
+    }
+    return s;
+}
 
 void print_system(bool *system, int n){
     for (int i = 0; i < n; i++) {
