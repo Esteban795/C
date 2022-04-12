@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define NUMBER_PI_DECIMAL 10000000
 
 void append_line(void){
     FILE* test = fopen("test","a");
@@ -132,16 +133,17 @@ int nth_decimal_of_pi(int n){
     return atoi(c);
 }
 
-void frequency_histogram_decimals_pi(FILE* input_stream){
+int* frequency_histogram_decimals_pi(FILE* input_stream){
     int* decimals = malloc(sizeof(int) * 10);
     for (int i = 0; i < 10; i++);
     char* c = '\0';
-    while (fscanf(input_stream,"%c",&c)){
+    while (fscanf(input_stream,"%c",&c) == 1){
         decimals[atoi(c)]++;
     }
     for (int i = 0; i < 10; i++){
-        printf("%d : %f",i,decimals[i]/10000000);
+        decimals[i] = (float)decimals[i] / (float)NUMBER_PI_DECIMAL;
     }
+    return decimals;
 }
 
 int main(void){
