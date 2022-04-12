@@ -4,13 +4,13 @@
 #include <stdbool.h>
 
 
-void question4(void){
+void append_line(void){
     FILE* test = fopen("test","a");
     fprintf(test,"WE DID IT BOYZ");
     fclose(test);
 }
 
-void question5(void){
+void x_squared(void){
     char* filename = "plot.txt";
     FILE* f = fopen(filename,"w");
     for (int i = 0; i <= 10000;i++){
@@ -19,8 +19,9 @@ void question5(void){
     fclose(f);
 }
 
-void copy(FILE* input_stream, FILE* output_stream){
+void copy_file(FILE* input_stream, FILE* output_stream){
     char c = "\0";
+    if (input_stream == NULL || output_stream == NULL) return EXIT_FAILURE;
     while (fscanf(input_stream,"%c",&c) == 1) {
         fprintf(output_stream,"%c",c);
     }
@@ -29,96 +30,91 @@ void copy(FILE* input_stream, FILE* output_stream){
 void copy_corrupted(FILE* input_stream, FILE* output_stream){
     char c = '\0';
     while (fscanf(input_stream,"%c",&c) == 1) {
-        if (c == 'a') {c = 'e';}
+        if (c == 'a') {c = 'e';} //replaces a by e, and e by a
         else if (c == 'e') {c = 'a';}
         fprintf(output_stream,"%c",c);
     }
 }
 
-int question8(){
-    FILE* f = fopen("data/prenoms/prenoms.txt","r");
-    int compteur = 0;
+int how_many_lines(FILE* input_stream){
+    if (input_stream == NULL) return EXIT_FAILURE;
+    int counter = 0;
     char c = '\0';
-    while (fscanf(f,"%c",&c) == 1){
-        if (c == '\n') {compteur++;}
+    while (fscanf(input_stream,"%c",&c) == 1){
+        if (c == '\n') counter++;
     }
-    return compteur;
+    return counter;
 }
 
-void question9(char letter,FILE* input_stream){
-    int compteur = 0;
+int words_starts_with_letter(FILE* input_stream,char letter){
+    int counter = 0;
     bool right_after_newline = true;
     char c = '\0';
     while (fscanf(input_stream,"%c",&c) == 1){
-        if (right_after_newline && c == letter){
-            compteur++;
-        }
+        if (right_after_newline && c == letter) counter++;//we just started a new line and first letter is the one we're looking for
         if (c == '\n') {right_after_newline = true;}
         else {right_after_newline = false;}
     }
-    printf("%d",compteur);
+    return counter;
 }
 
-void question10(FILE* input_stream,int max_longueur_prenom){
-    char* ligne = malloc(1 + max_longueur_prenom);
-    while (fscanf(input_stream,"%s",ligne) == 1){
-        if ((int)strlen(ligne) == max_longueur_prenom){
-            printf("\t%s\n",ligne);
+void print_longest_names(FILE* input_stream,int max_name_len){
+    char* line = malloc(1 + max_name_len);
+    while (fscanf(input_stream,"%s",line) == 1){
+        if ((int)strlen(line) == max_name_len){
+            printf("\t%s\n",line);
         }
     }
-    free(ligne);
-    printf("\n");
-    fclose(input_stream);
+    free(line);
 }
 
-void question10(FILE* input_stream,int min_longueur_prenom){
-    char* ligne = malloc(1 + min_longueur_prenom);
-    while (fscanf(input_stream,"%s",ligne) == 1){
-        if ((int)strlen(ligne) == min_longueur_prenom){
-            printf("\t%s\n",ligne);
+void print_shortest_names(FILE* input_stream,int min_name_len){
+    char* line = malloc(1 + min_name_len);
+    while (fscanf(input_stream,"%s",line) == 1){
+        if ((int)strlen(line) == min_name_len){
+            printf("\t%s\n",line);
         }
     }
-    free(ligne);
+    free(line);
     printf("\n");
-    fclose(input_stream);
 }
 
-bool question11(FILE* input_stream, char* firstname,int max_longueur_prenom){
-    char* ligne = malloc(max_longueur_prenom + 1);
-    while (fscanf(input_stream,"%s",ligne)) {
-        if (strcmp(ligne,firstname)){return true;}
+bool specific_name(FILE* input_stream, char* firstname,int max_name_len){
+    char* line = malloc(max_name_len + 1);
+    while (fscanf(input_stream,"%s",line)) {
+        if (strcmp(line,firstname)) return true;
     }
     return false;
 }
 
-float question12(FILE* input_stream,char letter){
-    int total = question8();
+float frequency_of_letter(FILE* input_stream,char letter){
+    int total = how_many_lines(input_stream);
+    fseek(input_stream,0,0);
     bool newline = true;
     char c = '\0';
-    int compteur = 0;
+    int counter = 0;
     while (fscanf(input_stream,"%c",&c)){
-        if (newline && input_stream == letter){compteur++;}
-        if (c == "\n") {newline = true;}
-        else {newline = false;}
+        if (newline && input_stream == letter) counter++;
+        if (c == "\n") newline = true;
+        else newline = false;
     }
-    return compteur/total;
+    return (float)counter/(float)total;
 }
 
 bool is_palindromic(char* str1){
     int len = strlen(str1);
     for (int i = 0; i < len; i++){
-        if (str1[i] != str1[len - i - 1]) {return false;}
+        if (str1[i] != str1[len - i - 1]) return false;
     }
     return true;
 }
 
 int question13(FILE* input_stream,int max_len){
-    char* ligne = malloc(max_len + 1);
-    int compteur = 0;
-    while (fscanf(input_stream,"%s",ligne) == 1){
-        if (is_palindromic(ligne)){compteur++;}
+    char* line = malloc(max_len + 1);
+    while (fscanf(input_stream,"%s",line) == 1){
+        if (is_palindromic(line)) printf("\t%s\n",line);
     }
-    return compteur;
+    return line;
 }
 
 int question14(FILE* input_stream){
@@ -126,7 +122,7 @@ int question14(FILE* input_stream){
     printf("Non, strlen(1+1) = 3.Quel dommage ! ");
 }
 
-int question18(int n){
+int nth_decimal_of_pi(int n){
     FILE* f = fopen("data/pi/pi.txt","r");
     char c = '\0';
     while (n > 0) {
@@ -136,7 +132,7 @@ int question18(int n){
     return atoi(c);
 }
 
-void question19(FILE* input_stream){
+void frequency_histogram_decimals_pi(FILE* input_stream){
     int* decimals = malloc(sizeof(int) * 10);
     for (int i = 0; i < 10; i++);
     char* c = '\0';
@@ -150,6 +146,5 @@ void question19(FILE* input_stream){
 
 int main(void){
     FILE* f = fopen("data/prenoms/prenoms.txt","r");
-    question10(f,100);
     return 0;
 }
