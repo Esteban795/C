@@ -1,25 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+
+
+/*
+Priority queue, implemented with a min-heap structure
+*/
 
 struct PrioQ {
-    int last;
-    int* priorities;
+    int last;  // basically, index of the last element
+    int* priorities; 
     int* keys;
-    int* mapping;
+    int* mapping; // mapping[i] is the index of the element i in priorities/keys tables
     int capacity;
 };
 
 typedef struct PrioQ prioq;
 
-int up(int i){
+int up(int i){ //index of the parent of the node
     return (i - 1)/2;
 }
 
-int left(int i){
+int left(int i){ //index of the left child of the node
     return 2 * i + 1;
 }
 
-int right(int i){
+int right(int i){ //index of the right child of the node
     return 2 * i + 2;
 }
 
@@ -95,4 +101,26 @@ void sift_down(prioq* q,int i){
         full_swap(q,i,mini);
         sift_down(q,mini);
     }
+}
+
+int* extract_min(prioq* q){
+    int* tab = malloc(sizeof(int) * 2); /* key and priority */
+    if (q->last < 0) return;
+    else {
+        int key = q->keys[0];
+        int priority = q->priorities[0];
+        full_swap(q,0,q->last);
+        q->last--;
+        sift_down(q,0);
+        tab[0] = key;
+        tab[1] = priority;
+        return tab;
+    }
+}
+
+void decrease_priority(prioq* q,int elt,int prio){
+    int i = q->mapping[elt];
+    assert(q->mapping[elt] > 0 && prio < q->priorities[i]);
+    q->priorities[i] <- prio;
+    sift_up(q,i);
 }
