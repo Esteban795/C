@@ -29,7 +29,7 @@ void print_schedule(task tasks[],int nb_tasks){
     for (int i = 0; i < nb_tasks; i++){
         print_task(tasks[i]);
     }
-    printf("\nTotal penalty : %d",total_penalty(tasks,nb_tasks));
+    printf("\nTotal penalty : %d\n",total_penalty(tasks,nb_tasks));
 }
 
 
@@ -66,4 +66,35 @@ void schedule(task tasks[],int nb_tasks){
         }
     }
     free(availables_times);
+}
+
+task* read_data(int* nb_tasks){
+    scanf("%d",nb_tasks);
+    task* tasks = malloc(*nb_tasks * sizeof(task));
+    int deadline,penalty;
+    for (int i = 0; i < *nb_tasks; i++){
+        scanf("%d %d",&deadline,&penalty);
+        tasks[i].id = i;
+        tasks[i].deadline = deadline;
+        tasks[i].penalty = penalty;
+        tasks[i].start = -1;
+    }
+    return tasks;
+}
+
+
+int compare_starts(const void* task1,const void* task2){
+    task* t1 = (task*)task1;
+    task* t2 = (task*)task2;
+    return t1->start - t2->start;
+}
+
+int main(void){
+    int nb_tasks;
+    task* tasks = read_data(&nb_tasks);
+    schedule(tasks,nb_tasks);
+
+    qsort(tasks, nb_tasks,sizeof(task),compare_starts);
+    print_schedule(tasks,nb_tasks);
+    free(tasks);
 }

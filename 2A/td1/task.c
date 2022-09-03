@@ -12,12 +12,11 @@ struct task {
 typedef struct task task;
 
 void print_task(task t){
-    char* text;
-    printf("Task %d (deadline %d) starts at time %d: %s,");
+    printf("Task %d (deadline %d) starts at time %d: ,",t.id,t.deadline,t.start);
     if (t.start >= t.deadline) {
-        printf("late, penalty %d",t.penalty);
+        printf("late, penalty %d\n",t.penalty);
     } else {
-        printf("on time, penalty 0");
+        printf("on time, penalty 0\n");
     }
 }
 
