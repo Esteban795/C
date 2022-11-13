@@ -26,7 +26,7 @@ int quickselect_aux(int* arr,int k, int len){
     }
 }
 
-int quickselect(int* arr,int k, int len){ //quickselect gives you the element that would be at index k if arr was sorted in O(n)
+int quickselect(int* arr,int k, int len){ //quickselect gives you the element that would be at index k if arr was sorted, in O(n)
     int* copy_arr = copy(arr,len);
     int result = quickselect_aux(copy_arr,k,len);
     free(copy_arr);
