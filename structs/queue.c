@@ -79,4 +79,5 @@ void cell_free(cell* c){
 
 void queue_free(queue* q){
     cell_free(q->left);
+    free(q);
 }
