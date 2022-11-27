@@ -1,9 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <assert.h>
-#include <limits.h>
 
 
 //Linked list implementation for queues.
