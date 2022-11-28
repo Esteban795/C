@@ -66,3 +66,40 @@ vertex* bfs_residual(flow_graph* g,int** f){
     queue_free(q);
     return parents;
 }
+
+int path_capacity(flow_graph* g,int** f,vertex* parents){
+    int m = INT_MAX;
+    vertex s = g->t;
+    while (s != g->s){
+        vertex parent = parents[s];
+        m = min(m,g->capacity[parent][s] - f[parent][s]);
+        s = parent;
+    }
+    return m;
+}
+
+bool saturate_path(flow_graph* g,int** f,vertex* parents){
+    int min_capacity = path_capacity(g,f,parents);
+    if (min_capacity == 0) return false;
+    vertex s = g->t;
+    while (s != g->s){
+        vertex parent = parents[s];
+        f[parent][s] += min_capacity;
+        f[s][parent] -= min_capacity;
+        s = parent;
+    }
+    return true;
+}
+
+bool step(flow_graph* g,int** f){
+    int* parents = bfs_residual(g,f);
+    bool modified = saturate_path(g,f,parents);
+    free(parents);
+    return modified;
+}
+
+int** ford_fulkerson(flow_graph* g){
+    int** f = zeroes(g->n);
+    while (step(g,f)) {}
+    return f;
+}
