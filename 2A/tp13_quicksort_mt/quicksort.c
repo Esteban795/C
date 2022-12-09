@@ -20,15 +20,15 @@ void insertion_sort(int *arr, int len){
 }
 
 int partition(int *arr, int len){
-    int pivot = arr[0];
     int i = 1;
-    for (int j = 0; j < len; j++){
-        if (arr[j] > pivot) {
-            swap(arr,j,i);
+    int x = arr[0];
+    for (int j = 1; j < len; j++){
+        if (arr[j] <= x) {
+            swap(arr, i, j);
             i++;
         }
     }
-    swap(arr,i - 1,len - 1);
+    swap(arr, 0, i - 1);
     return i - 1;
 }
 
@@ -40,11 +40,5 @@ void full_sort(int *arr, int len){
         int indice_pivot = partition(arr,len);
         full_sort(arr,indice_pivot + 1);
         full_sort(arr + indice_pivot + 1,len - indice_pivot - 1);
-    }
-}
-
-void print_tab(int* tab, int len){
-    for (int i = 0; i < len;i++){
-        printf("%d | ",tab[i]);
     }
 }

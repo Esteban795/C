@@ -62,8 +62,8 @@ bool try_pop_left(deque_t *q, slice_t *result){
         pthread_mutex_unlock(&q->lock);
         return false;
     }
-    q->sentinel->next = left->next;
-    left->next->prev = q->sentinel;
+    left->prev->next = left->next;
+    left->next->prev = left->prev;
     *result = left->slice;
     free(left);
     pthread_mutex_unlock(&q->lock);
@@ -77,8 +77,8 @@ bool try_pop_right(deque_t *q, slice_t *result){
         pthread_mutex_unlock(&q->lock);
         return false;
     }
-    q->sentinel->prev= right->prev;
-    right->prev->next = q->sentinel;
+    right->next->prev= right->prev;
+    right->prev->next = right->next;
     *result = right->slice;
     free(right);
     pthread_mutex_unlock(&q->lock);
@@ -92,6 +92,7 @@ void push_left(deque_t *q, slice_t data){
     q->sentinel->next = n;
     n->prev = q->sentinel;
     n->next->prev = n;
+    pthread_mutex_unlock(&q->lock);
 }
 
 void push_right(deque_t *q, slice_t data){
@@ -101,6 +102,7 @@ void push_right(deque_t *q, slice_t data){
     q->sentinel->prev = n;
     n->next = q->sentinel;
     n->prev->next = n;
+    pthread_mutex_unlock(&q->lock);
 }
 
 
