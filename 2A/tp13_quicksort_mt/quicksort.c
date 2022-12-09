@@ -33,12 +33,14 @@ int partition(int *arr, int len){
 }
 
 void full_sort(int *arr, int len){
+    if (len <= 1) return;
     if (len < INSERTION_LIMIT) {
         insertion_sort(arr,len);
+        return;
     }
     else {
         int indice_pivot = partition(arr,len);
-        full_sort(arr,indice_pivot + 1);
+        full_sort(arr,indice_pivot);
         full_sort(arr + indice_pivot + 1,len - indice_pivot - 1);
     }
 }
