@@ -1,92 +1,90 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdbool.h>
 
-struct Node {
-    int value;
-    struct Node *prev;
-    struct Node *next;
+#include "deque.h"
+
+
+struct node {
+    int num;
+    struct node *next;
+    struct node *prev;
 };
 
-typedef struct Node node;
+typedef struct node node_t;
 
-struct DLL{
-    struct Node *sentinel;
+struct deque {
+    node_t* sentinel;
 };
 
-typedef struct DLL dll;
+typedef struct deque deque_t;
 
-dll* new_dll(void){
-    dll* new = malloc(sizeof(dll));
-    node* sentinelle = new_node(-1);
-    sentinelle->prev = sentinelle;
-    sentinelle->next = sentinelle;
-    new->sentinel = sentinelle;
-    return new;
+node_t *new_node(int data){
+    node_t *n = malloc(sizeof(node_t));
+    n->next = NULL;
+    n->prev = NULL;
+    n->num = data;
+    return n;
 }
 
-void delete_node_2(node *n){
-    n->prev->next = n->next;
-    n->next->prev = n->prev;
-    free(n);
+deque_t *new_deque(void){
+    deque_t *q = malloc(sizeof(deque_t));
+    q->sentinel = new_node(-1);
+    q->sentinel->next = q->sentinel;
+    q->sentinel->prev = q->sentinel;
+    return q;
 }
 
-node* insert_before(node* n,int x){
-    node* new = new_node(x);
-    new->next = n;
-    new->prev = n->prev;
-    n->prev = new;
-    new->prev->next = new;
-    return new;
-}
-
-node* insert_after(node* n,int x){
-    node* new = new_node(x);
-    new->prev = n;
-    new->next = n->next;
-    n->next = new;
-    new->next->prev = new;
-    return new;
-}
-
-void free_dll(dll* d){
-    node* n = d->sentinel->prev;
-    while (n != d->sentinel) {
-        node* temp = n->next;
+void free_deque(deque_t *q){
+    node_t *n = q->sentinel->next;
+    while (n != q->sentinel) {
+        node_t *tmp = n->next;
         free(n);
-        n = temp;
+        n = tmp;
     }
-    free(d->sentinel);
-    free(d);
+    free(q->sentinel);
+    free(q);
 }
 
-void push_left(dll* d, int x) {
-    insert_after_2(d->sentinel,x);
-}
-
-void push_right(dll* d, int x){
-    insert_before_2(d->sentinel,x);
-}
-
-int pop_left(dll* d){
-    node* first_elt = d->sentinel->next;
-    assert(first_elt != d->sentinel);
-    int val = first_elt->value;
-    delete_node_2(first_elt);
-    return val;
-}
-
-int pop_right(dll *d){
-    node* last_elt = d->sentinel->prev;
-    assert(last_elt != d->sentinel);
-    int val = last_elt->value;
-    delete_node_2(last_elt);
-    return val;
-}
-
-dll* from_array(int t[],int len){
-    dll* new = new_dll();
-    for (int i = 0; i < len; i++){
-        push_right(new,t[i]);
+bool try_pop_left(deque_t *q, int *result){
+    node_t* left = q->sentinel->next;
+    if (left == q->sentinel){
+        return false;
     }
-    return new;
+    left->prev->next = left->next;
+    left->next->prev = left->prev;
+    *result = left->num;
+    free(left);
+    return true;
 }
+
+bool try_pop_right(deque_t *q, int *result){
+    node_t* right = q->sentinel->prev;
+    if (right == q->sentinel){
+        return false;
+    }
+    right->next->prev= right->prev;
+    right->prev->next = right->next;
+    *result = right->num;
+    free(right);
+    return true;
+}
+
+void push_left(deque_t *q, int data){
+    node_t* n = new_node(data);
+    n->next = q->sentinel->next;
+    q->sentinel->next = n;
+    n->prev = q->sentinel;
+    n->next->prev = n;
+}
+
+void push_right(deque_t *q, int data){
+    node_t* n = new_node(data);
+    n->prev = q->sentinel->prev;
+    q->sentinel->prev = n;
+    n->next = q->sentinel;
+    n->prev->next = n;
+}
+
+
