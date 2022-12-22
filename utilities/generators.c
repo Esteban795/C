@@ -2,18 +2,18 @@
 #include <stdio.h>
 
 
-int* generate_tab(int n, int init){
-    int* tab = malloc(sizeof(int) * n);
+int* generate_arr(int n, int init){
+    int* arr = malloc(sizeof(int) * n);
     for (int i = 0; i < n;i++){
-        tab[i] = init;
+        arr[i] = init;
     }
-    return tab;
+    return arr;
 }
 
 int** generate_matrix(int n,int init){
     int** m = malloc(sizeof(int*) * n);
     for (int i = 0; i < n; i++){
-        m[i] = generate_tab(n,init);
+        m[i] = generate_arr(n,init);
     }
     return m;
 }
