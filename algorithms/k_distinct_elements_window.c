@@ -2,6 +2,14 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdint.h>
+#include "../utilities/printers.c"
+
+/*
+This algorithm allows you to look for the first k-sized window of distincts elements in an array.
+Complexity : O(n) time, O(p) space (where p is the number of distincts elements in the array)
+*/
+
 
 struct bornes { //return arguments for main function
     int i;
@@ -10,12 +18,17 @@ struct bornes { //return arguments for main function
 
 typedef struct bornes bornes;
 
-
-//Implementation of a set, with number of occurences of an item seen.
+//BST implementation 
+#include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 const uint8_t empty = 0;
 const uint8_t occupied = 1;
 
+typedef uint32_t T;
 struct bucket {
     uint8_t status;
     uint32_t element;
@@ -33,17 +46,18 @@ typedef struct set set;
 uint64_t ones(int p){
     return (1ull << p) - 1ull;
 }
-uint64_t hash(int x,int p){
-    return x & ones(p);
+
+uint64_t hash(uint32_t k,int p) {
+    return k & ones(p);
 }
 
-set* set_new(void){
-    set* s = malloc(sizeof(set));
+set *set_new(void) {
+    set *s = malloc(sizeof(set));
     s->p = 1;
-    s->a = malloc(sizeof(bucket) * 2);
-    s->nb_empty = 2;
+    s->a = malloc(2 *sizeof(bucket));
     s->a[0].status = empty;
     s->a[1].status = empty;
+    s->nb_empty = 2;
     return s;
 }
 
@@ -52,11 +66,11 @@ void set_delete(set* s){
     free(s);
 }
 
-bool set_is_member(set* s, int x){
+bool set_is_member(set* s, T x){
     uint64_t index = hash(x,s->p);
     while (true) {
         if (s->a[index].status == empty) return false;
-        if (s->a[index].element == x) return true;
+        else if (s->a[index].element == x) return true;
         index += 1;
         index = index & ones(s->p);
     }
@@ -74,26 +88,26 @@ uint64_t set_begin(set* s){
     return i;
 }
 
-uint64_t set_next(set* s,uint64_t i){
+uint64_t set_next(set *s,uint64_t i) {
     i++;
-    while (s->a[i].status == empty && i < (1ull << s->p)){
+    uint64_t end = set_end(s);
+    while (i < end && s->a[i].status == empty) {
         i++;
     }
     return i;
 }
 
-int set_get(set* s, uint64_t i){
-    return s->a[i].element;
+bucket set_get(set* s, uint64_t i){
+    return s->a[i];
 }
 
-uint64_t set_search(set* s,int x, bool *found){
+uint64_t set_search(set* s,T x, bool *found){
     uint64_t index = hash(x,s->p);
     while (true) {
         if (s->a[index].status == empty){
             *found = false;
             return index;
-        } 
-        if (s->a[index].element == x){
+        } else if (s->a[index].element == x){
             *found = true;
             return index;
         }
@@ -102,49 +116,68 @@ uint64_t set_search(set* s,int x, bool *found){
     }
 }
 
-void set_resize(set *s, int p){
-    set* new_set = malloc(sizeof(set));
-    new_set->p = p;
-    new_set->a = malloc(sizeof(bucket) * set_end(s));
-    for (uint64_t i = 0; i < set_end(s);i++){
-        s->a[i].status = empty;
+void set_resize(set *s,int p) {// Prepare an empty table of size 2**p
+    uint64_t m = 1ull << p;
+    set *s_new = malloc(sizeof(set));
+    s_new->p = p;
+    s_new->a = malloc(m *sizeof(bucket));
+    for(uint64_t i = 0; i < m; ++i) {
+        s_new->a[i].status = empty;
     }
-    for (uint64_t i = set_begin(s); i < set_end(s);set_next(s,i)){
-        int x = set_get(s,i);
+    s_new->nb_empty = m;
+    // Add the elements of s to that table
+    for (uint64_t i = set_begin(s); i != set_end(s); i = set_next(s, i)) {
+        bucket x = set_get(s, i);
         bool found;
-        uint64_t k = set_search(new_set,x,&found);
-        new_set->a[k].status = occupied;
-        new_set->a[k].element = x;
-        new_set->nb_empty--;
+        uint64_t j = set_search(s_new, x.element, &found);
+        s_new->a[j].status = occupied;
+        s_new->a[j].element = x.element;
+        s_new->a[j].occurences = x.occurences;
+        s_new->nb_empty--;
     }
     free(s->a);
-    *s = *new_set;
-    free(new_set);
+    s->a = s_new->a;
+    s->p = p;
+    s->nb_empty = s_new->nb_empty;
+    free(s_new);
 }
 
-void set_add(set* s,int x){
-    uint64_t i = hash(x,s->p);
+void set_add(set *s,uint32_t x) {
     bool found;
-    uint64_t j = set_search(s,x,&found);
-    if (found) {
-        s->a[i].occurences++; //déjà dans le tableau donc on augmente son occurence
-    } 
-    uint64_t size = set_end(s); 
-    if (s->nb_empty <= 1){ //plus de place
-        set_resize(s, 1 + s->p); 
-        j = set_search(s,x,&found); //modifie l'indice où on devrait donc placer x
+    uint64_t j = set_search(s, x, &found);
+    if (found) return; 
+    uint64_t m = 1ull << s->p;
+    if (s->nb_empty <= 1 || 3 * s->nb_empty <= m) {
+        set_resize(s, s->p + 1);
+        j = set_search(s, x, &found);
     }
     s->a[j].status = occupied;
     s->a[j].element = x;
+    s->a[j].occurences = 0;
     s->nb_empty--;
 }
 
-void set_change_occurence(set* s,int x,int n){
-    uint64_t h = hash(x,s->p);
-    bool exists;
-    if (set_is_member(s,x)){
-        s->a[h].occurences += n;
+void print_bucket(bucket b){
+    printf("Element : %d\n",b.element);
+    printf("Status : %d\n",b.status);
+    printf("Occurences : %d\n",b.occurences);
+}
+
+void set_change_occurence(set* s,T x,int delta){
+    bool found;
+    int index = set_search(s,x,&found);
+    if (found) {
+        //print_bucket(s->a[index]);
+        bucket* tab = s->a;
+        tab[index].occurences = tab[index].occurences + delta;
+        //print_bucket(s->a[index]);
     }
+}
+
+int set_get_occs(set* s,T x){
+    bool found;
+    int index = set_search(s,x,&found);
+    return s->a[index].occurences;
 }
 
 // set implementation
@@ -159,32 +192,44 @@ bornes* new_bornes(int i,int j){
 bornes* k_distinct_elements_window(int* arr,int n,int k){
     int i = 0;
     int j = 0;
-    int dist = 0;
-    set* occurences = set_new();
-    bool found;
-    while (j < n){ 
-        while (dist == k){
-            set_change_occurence(occurences,arr[i],-1);
-            if (set_is_member(occurences,arr[i])) {dist--;}
-            i++;
-        }
-        while (j < n && (dist < k || set_is_member(occurences,arr[j]))){
-            if (!set_is_member(occurences,arr[j])) {dist++;}
-            set_change_occurence(occurences,arr[j],1);
+    int nb_unique = 0;
+    set* s = set_new();
+    for (int i = 0; i < n;i++){
+        set_add(s,arr[i]);
+    }
+    printf("\n\n\n\n\n");
+    while (j < n){
+        while (j < n && (nb_unique < k || set_get_occs(s,arr[j] > 0))){
+            if (set_get_occs(s,arr[j]) == 0) nb_unique++;
+            set_change_occurence(s,arr[j],1);
             j++;
         }
-        if (dist == k){
-            return new_bornes(i,j);
+        while (nb_unique == k){
+            set_change_occurence(s,arr[i],-1);
+            if (set_get_occs(s,arr[i]) == 0) nb_unique--;
+            i++;
+            if (j - i == k){
+                return new_bornes(i,j - 1); //j est le terme d'après
+            }
         }
     }
-
+    return new_bornes(-1,-1);
 }
 
-int main(int argc,char* argv){
+int main(int argc,char* argv[]){
     if (argc != 3) return EXIT_FAILURE;
     int n = atoi(argv[1]);
     int k = atoi(argv[2]);
-    
-
+    int* arr = malloc(sizeof(int) * n);
+    int t;
+    for (int i = 0; i < n;i++){
+        scanf("%d",&t);
+        arr[i] = t;
+    }
+    print_tab(arr,n);
+    bornes* result = k_distinct_elements_window(arr,n,k);
+    printf("Result is : from %d to %d\n\n",result->i,result->j);
+    free(arr);
+    free(result);
     return 0;
 }
