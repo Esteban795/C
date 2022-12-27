@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdint.h>
+#include <assert.h>
 #include "../utilities/printers.c"
 
 /*
@@ -18,17 +18,13 @@ struct bornes { //return arguments for main function
 
 typedef struct bornes bornes;
 
-//BST implementation 
-#include <assert.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+//Set implementation 
 
 const uint8_t empty = 0;
 const uint8_t occupied = 1;
 
 typedef uint32_t T;
+
 struct bucket {
     uint8_t status;
     uint32_t element;
@@ -157,20 +153,12 @@ void set_add(set *s,uint32_t x) {
     s->nb_empty--;
 }
 
-void print_bucket(bucket b){
-    printf("Element : %d\n",b.element);
-    printf("Status : %d\n",b.status);
-    printf("Occurences : %d\n",b.occurences);
-}
-
 void set_change_occurence(set* s,T x,int delta){
     bool found;
     int index = set_search(s,x,&found);
     if (found) {
-        //print_bucket(s->a[index]);
         bucket* tab = s->a;
         tab[index].occurences = tab[index].occurences + delta;
-        //print_bucket(s->a[index]);
     }
 }
 
@@ -180,7 +168,7 @@ int set_get_occs(set* s,T x){
     return s->a[index].occurences;
 }
 
-// set implementation
+// set implementation done
 
 bornes* new_bornes(int i,int j){
     bornes* b = malloc(sizeof(bornes));
@@ -197,7 +185,6 @@ bornes* k_distinct_elements_window(int* arr,int n,int k){
     for (int i = 0; i < n;i++){
         set_add(s,arr[i]);
     }
-    printf("\n\n\n\n\n");
     while (j < n){
         while (j < n && (nb_unique < k || set_get_occs(s,arr[j] > 0))){
             if (set_get_occs(s,arr[j]) == 0) nb_unique++;
@@ -209,7 +196,7 @@ bornes* k_distinct_elements_window(int* arr,int n,int k){
             if (set_get_occs(s,arr[i]) == 0) nb_unique--;
             i++;
             if (j - i == k){
-                return new_bornes(i,j - 1); //j est le terme d'après
+                return new_bornes(i,j - 1); //[i,j[ interval, so removing 1 closes the parenthese
             }
         }
     }
