@@ -196,7 +196,7 @@ bornes* k_distinct_elements_window(int* arr,int n,int k){
             if (set_get_occs(s,arr[i]) == 0) nb_unique--;
             i++;
             if (j - i == k){
-                return new_bornes(i,j - 1); //[i,j[ interval, so removing 1 closes the parenthese
+                return new_bornes(i,j - 1); //[i,j[ interval, so removing 1 closes the interval
             }
         }
     }
