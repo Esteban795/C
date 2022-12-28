@@ -43,8 +43,15 @@ double find_angle_horizontal(point A,point B){
     return atan(oppose/adjacent);
 }
 
+double comp(point pivot,point A, point B){
+    double angle1 = find_angle_horizontal(pivot,A);
+    double angle2 = find_angle_horizontal(pivot,B);
+    return angle1 - angle2;
+}
+
 point* graham_scan(point* points,int n){
     point pivot = points[find_pivot(points,n)];
+    qsort(points + 1,n,sizeof(point),comp);
     return NULL;
 }
 
