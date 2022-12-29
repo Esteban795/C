@@ -9,7 +9,7 @@ typedef int T;
 
 struct node {
     T data;
-    node* next;
+    struct node* next;
 };
 
 typedef struct node node;
@@ -66,3 +66,18 @@ T stack_pop(stack* s){
     return result;
 }
 
+int main(int argc,char* argv[]){
+    if (argc != 2) return 1;
+    int n = atoi(argv[1]);
+    int temp;
+    stack* s = new_stack();
+    for (int i = 0; i < n;i++){
+        scanf("%d",&temp);
+        stack_push(s,temp);
+    }
+    for (int i = 0; i < n;i++){
+        printf("%d\n",stack_pop(s));
+    }
+    free_stack(s);
+    return 0;
+}
