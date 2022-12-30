@@ -66,6 +66,17 @@ T stack_pop(stack* s){
     return result;
 }
 
+T stack_peek(stack* s){
+    assert(s->len >0);
+    return s->top->data;
+}
+
+T stack_peek_second(stack* s){
+    assert(s->len > 1);
+    return s->top->next->data;
+}
+
+/*
 int main(int argc,char* argv[]){
     if (argc != 2) return 1;
     int n = atoi(argv[1]);
@@ -80,4 +91,4 @@ int main(int argc,char* argv[]){
     }
     free_stack(s);
     return 0;
-}
+}*/
