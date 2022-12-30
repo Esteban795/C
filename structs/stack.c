@@ -95,11 +95,20 @@ void print_rec(node* n){
     }
 }
 
-void print_stack(stack* s){
+void stack_print(stack* s){
     print_rec(s->top);
 }
 
-
+int* stack_to_arr(stack* s){
+    int* arr = malloc(sizeof(int) * s->len);
+    stack* c = stack_copy(s);
+    for (int i = 0; i < s->len;i++){
+        arr[i] = stack_pop(c);
+    }
+    free_stack(c);
+    return arr;
+}
+/*
 int main(int argc,char* argv[]){
     if (argc != 2) return 1;
     int n = atoi(argv[1]);
@@ -110,8 +119,11 @@ int main(int argc,char* argv[]){
         stack_push(s,temp);
     }
     stack* c = stack_copy(s);
-    print_stack(c);
+    printf("Stack_peek : %d\n",stack_peek(c));
+    printf("Stack_peek_second : %d\n",stack_peek_second(s));
+    stack_print(c);
     free_stack(c);
     free_stack(s);
     return 0;
 }
+*/
