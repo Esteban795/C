@@ -37,9 +37,8 @@ void boyer_moore(char* text,char* substring){
 }
 
 
-int main(void){
-    char txt[] = "ABAAABD";
-    char pat[] = "ABC";
-    boyer_moore(txt, pat);
+int main(int argc,char* argv[]){
+    if (argc != 3) return EXIT_FAILURE;
+    boyer_moore(argv[1], argv[2]);
     return 0;
 }

@@ -4,7 +4,7 @@
 #include "../structs/stack.c"
 
 // Graham Scan (2D plane)
-
+//,Convex hull algorithm
 struct point {
     int x;  
     int y;
