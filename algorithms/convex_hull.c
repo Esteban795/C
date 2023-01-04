@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "../structs/stack.c"
 
+
 // Graham Scan (2D plane)
 //,Convex hull algorithm
 struct point {
@@ -35,8 +36,8 @@ void swap(point* points,int i, int j){
 int orientation(point A,point B, point C){
     int res = ((B.y - A.y) * (C.x - B.x) - (B.x - A.x) * (C.y - B.y));
     if (res == 0) return 0;
-    if (res > 0) return 2;
-    if (res < 0) return 1;
+    if (res > 0) return 1;
+    if (res < 0) return 2;
 }
 
 int dist(point A,point B){
@@ -55,7 +56,7 @@ int compare(const void* A,const void* B){
         return 1;
     }
     if (o == 2) return -1;
-    if (o == 1) return 1;
+    return 1;
 }
 
 
@@ -87,7 +88,7 @@ int find_pivot(point* points,int n){ //lexical order with (y,x) ok
 point* remove_same_angle_points(point* points,int n,int* new_len){
     int nb_same_angle = 0;
     for (int i = 1; i < n - 1;i++){ //first, check for the number of points that are colinear
-        if (orientation(pivot,points[i],points[i+1]) == 0){
+        if (orientation(pivot,points[i],points[i + 1]) == 0){
             nb_same_angle++;
         }
     }
@@ -111,19 +112,27 @@ result graham_scan(point* points,int n){
     swap(points,0,piv);
     qsort(points,n,sizeof(point),compare);
     //We now need to remove points that have the same angle, and only keep the farthest from pivot ones.
+    for (int i = 0; i < n;i++){
+        printf("Point %d (%d,%d)\n",i,points[i].x,points[i].y);
+    }
     int new_len;
     point* unique_angle_points = remove_same_angle_points(points,n,&new_len);
-    unique_angle_points[0] = pivot;
+    unique_angle_points[0] = pivot;/*
+    for (int i = 0; i < new_len;i++){
+        printf("Point %d (%d,%d)\n",i,unique_angle_points[i].x,unique_angle_points[i].y);
+    }*/
     stack* s = stack_new();
     stack_push(s,0);
     stack_push(s,1);
     stack_push(s,2);
     for (int i = 3; i < new_len;i++){
-        while (s->len > 1 && orientation(unique_angle_points[stack_peek_second(s)],unique_angle_points[stack_peek(s)],unique_angle_points[i]) != 2  ) {
+        while (s->len > 1 && orientation(unique_angle_points[stack_peek_second(s)],unique_angle_points[stack_peek(s)],unique_angle_points[i]) != 2) {
             stack_pop(s);
         }
         stack_push(s,i);
     }
+    stack_print(s);
+    printf("\n\n\n");
     int* indexes = stack_to_arr(s);
     point* convex_hull = malloc(sizeof(point) * s->len);
     for (int i = 0; i < s->len;i++){
@@ -136,21 +145,27 @@ result graham_scan(point* points,int n){
     return res;
 }
 
-int main(int argc,char* argv[]){
-    if (argc != 2) return 1;
-    int n = atoi(argv[1]);
-    point* points = malloc(sizeof(point) * n);
+point* build_arr(FILE* f,int n){
+    point* points = malloc(n * sizeof(point));
     int temp_x,temp_y;
-    for (int i = 0;i < n;i++){
-        scanf("%d %d",&temp_x,&temp_y);
+    for (int i = 0; i < n;i++){
+        fscanf(f,"%d %d\n",&temp_x,&temp_y);
         point p = {.x = temp_x,.y = temp_y};
         points[i] = p;
     }
+    return points;
+}
+
+int main(int argc,char* argv[]){
+    if (argc != 2) return 1;
+    FILE* f = fopen(argv[1],"r");
+    int n;
+    fscanf(f,"%d\n",&n);
+    point* points = build_arr(f,n);
     result res = graham_scan(points,n);
     for (int i = 0; i < res.len;i++){
         printf("Point (%d,%d)\n",res.arr[i].x,res.arr[i].y);
     }
     free(res.arr);
-
     return 0;
 }
