@@ -1,6 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/*
+Input : ./file_generator filename n low high
+
+- filename : filename of output
+- n : number of 2D coordinates points you wanna get.
+- [low,high] : interval for which random coordinates will emerge from
+*/
+
 int rand_between(int l, int r) {
   return (int)( (rand() / (RAND_MAX * 1.0f)) * (r - l) + l);
 }

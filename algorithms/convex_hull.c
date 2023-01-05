@@ -28,6 +28,7 @@ void swap(point* points,int i, int j){
     points[j] = temp;
 }
 
+
 /* Find the orientation between 3 points.
 # 0 --> A, B and C are collinear
 # 1 --> Clockwise
@@ -55,18 +56,8 @@ int compare(const void* A,const void* B){
         if (dist(pivot,b) >= dist(pivot,a)) return -1;
         return 1;
     }
-    if (o == 2) return -1;
-    return 1;
-}
-
-
-bool comp(point A,point B){//lexical order with (y,x) coordinates
-    if (A.y < B.y) {
-        return false;
-    } else if (A.y == B.y && B.x > A.x){
-        return false;
-    }
-    return true;
+    else if (o == 2) return -1;
+    else return 1;
 }
 
 /*
@@ -77,33 +68,24 @@ int find_pivot(point* points,int n){ //lexical order with (y,x) ok
     int index = 0;
     point minimum = points[0];
     for (int i = 0; i < n;i++){
-        if (comp(minimum,points[i])) {
-            minimum = points[i];
+        if (points[i].y < minimum.y || (points[i].y == minimum.y && points[i].x < minimum.y)){
             index = i;
+            minimum = points[i];
         }
     }
     return index;
 }
 
-point* remove_same_angle_points(point* points,int n,int* new_len){
-    int nb_same_angle = 0;
-    for (int i = 1; i < n - 1;i++){ //first, check for the number of points that are colinear
-        if (orientation(pivot,points[i],points[i + 1]) == 0){
-            nb_same_angle++;
-        }
-    }
-    int m = 1;
-    *new_len = n - nb_same_angle;
-    point* new_points = malloc(sizeof(point) * (*new_len));
+int remove_same_angle_points(point* points,int n){
+    int new_len = 1;
     for (int i = 1; i < n ;i++){
         while (i < n - 1 && orientation(pivot,points[i],points[i+ 1]) == 0){
             i++;
         }
-        new_points[m] = points[i];
-        m++;
+        points[new_len] = points[i];
+        new_len++;
     }
-    free(points);
-    return new_points;
+    return new_len;
 }
 
 result graham_scan(point* points,int n){
@@ -112,34 +94,24 @@ result graham_scan(point* points,int n){
     swap(points,0,piv);
     qsort(points,n,sizeof(point),compare);
     //We now need to remove points that have the same angle, and only keep the farthest from pivot ones.
-    for (int i = 0; i < n;i++){
-        printf("Point %d (%d,%d)\n",i,points[i].x,points[i].y);
-    }
-    int new_len;
-    point* unique_angle_points = remove_same_angle_points(points,n,&new_len);
-    unique_angle_points[0] = pivot;/*
-    for (int i = 0; i < new_len;i++){
-        printf("Point %d (%d,%d)\n",i,unique_angle_points[i].x,unique_angle_points[i].y);
-    }*/
+    int new_len = remove_same_angle_points(points,n);
     stack* s = stack_new();
     stack_push(s,0);
     stack_push(s,1);
     stack_push(s,2);
     for (int i = 3; i < new_len;i++){
-        while (s->len > 1 && orientation(unique_angle_points[stack_peek_second(s)],unique_angle_points[stack_peek(s)],unique_angle_points[i]) != 2) {
+        while (s->len > 1 && orientation(points[stack_peek_second(s)],points[stack_peek(s)],points[i]) != 2) {
             stack_pop(s);
         }
         stack_push(s,i);
     }
-    stack_print(s);
-    printf("\n\n\n");
     int* indexes = stack_to_arr(s);
     point* convex_hull = malloc(sizeof(point) * s->len);
     for (int i = 0; i < s->len;i++){
-        convex_hull[i] = unique_angle_points[i];
+        convex_hull[i] = points[indexes[i]];
     }
     result res = {.arr = convex_hull,.len=s->len};
-    free(unique_angle_points);
+    free(points);
     free(indexes);
     free_stack(s);
     return res;
@@ -163,9 +135,11 @@ int main(int argc,char* argv[]){
     fscanf(f,"%d\n",&n);
     point* points = build_arr(f,n);
     result res = graham_scan(points,n);
-    for (int i = 0; i < res.len;i++){
+    for (int i = 0; i < res.len;i++){ //prints the points that forms the convex hull
         printf("Point (%d,%d)\n",res.arr[i].x,res.arr[i].y);
     }
     free(res.arr);
     return 0;
 }
+
+//gcc convex_hull.c -o ch -Wall -Wvla -Wextra -fsanitize=address -lm
