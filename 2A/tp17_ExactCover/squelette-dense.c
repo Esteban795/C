@@ -143,16 +143,35 @@ void print_partial_solution(Dense *inst, Partial *partial){
 
 // Exercice 5
 
-void cover_column(Dense *inst, Partial *partial, int r, int c);
+void cover_column(Dense *inst, Partial *partial, int r, int c){
+    partial->remaining_columns[c] = false;
+    for (int j = 0; j < inst->nb_rows;j++){
+        if (inst->data[j][r] && j != r) partial->remaining_rows[j] = false;
+    }
+}
 
-void select_row(Dense *inst, Partial *partial, int r);
+void select_row(Dense *inst, Partial *partial, int r){
+    for (int j = 0; j < inst->nb_rows; j++){
+        if (partial->remaining_columns[j]){
+            cover_column(inst,partial,r,j);
+        }
+    }
+    partial->remaining_rows[r] = false;
+    partial->selected_rows[r] = true;
+}
 
 
 // Exercice 6
 
-int choose_first_column(Dense *inst, Partial *partial);
+int choose_first_column(Dense *inst, Partial *partial){
+    for (int c = 0; c < inst->nb_columns;c++){
+        if (!partial->remaining_rows[c]) return c;
+    }
+}
 
-int count(Dense *inst, Partial *partial);
+int count(Dense *inst, Partial *partial){
+    
+}
 
 
 bool search(Dense *inst, Partial *partial, Partial **solution);
