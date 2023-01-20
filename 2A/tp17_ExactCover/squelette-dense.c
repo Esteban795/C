@@ -144,10 +144,10 @@ void print_partial_solution(Dense *inst, Partial *partial){
 // Exercice 5
 
 void cover_column(Dense *inst, Partial *partial, int r, int c){
-    partial->remaining_columns[c] = false;
-    for (int j = 0; j < inst->nb_rows;j++){
-        if (inst->data[j][r] && j != r) partial->remaining_rows[j] = false;
+    for (int i = 0; i < inst->nb_rows;i++){
+        if (inst->data[i][r] && i != r) partial->remaining_rows[i] = false;
     }
+    partial->remaining_columns[c] = false;
 }
 
 void select_row(Dense *inst, Partial *partial, int r){
@@ -163,14 +163,46 @@ void select_row(Dense *inst, Partial *partial, int r){
 
 // Exercice 6
 
+int counter_true(bool* arr,int len){
+    int s = 0; 
+    for (int i = 0; i < len;i++){
+        if (arr[i]) s++;
+    }
+    return s;
+}
+
+
 int choose_first_column(Dense *inst, Partial *partial){
     for (int c = 0; c < inst->nb_columns;c++){
         if (!partial->remaining_rows[c]) return c;
     }
 }
 
+int choose_column_min(Dense* inst,Partial* partial){
+    int min_cardinal = 1 << 20;
+    int chosen_column = choose_first_column(inst,partial);
+    for (int j = 0; j < inst->nb_columns;j++){
+        int nb = 0;
+        for (int i = 0; i < inst->nb_rows;i++){
+            if (partial->selected_rows[r] = true;) nb++;
+        }
+        if (nb < min_cardinal) {
+            min_cardinal = nb;
+            chosen_column = j;
+        }
+    }
+    return chosen_column;
+}
 int count(Dense *inst, Partial *partial){
-    
+    int n = inst->nb_rows;
+    int p = inst->nb_columns;
+    if (counter_true(partial->remaining_columns,p) == 0) return 1;
+    if (counter_true(partial->remaining_rows,n) == 0) return 0;
+    int c = choose_first_column(inst,partial);
+    int nb_sol = 0;
+    for (int i = 0; i < n;i++){
+        if ()
+    }
 }
 
 
