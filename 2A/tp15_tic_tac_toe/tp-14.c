@@ -169,7 +169,50 @@ void afficher(ttt* jeu){
     print_sep(jeu);
 }
 
-void jouer_partie(int k, int n);
+void jouer_partie(int k, int n){
+    ttt* jeu = init_jeu(k,n);
+    char c;
+    int IA,cln,lgn;
+    while (true) {
+        printf("Voulez-vous commencer ? (o/n)\n");
+        scanf("%c",&c);
+        if (c == 'o'){
+            IA = 2;
+            break;
+        } else if (c == 'n') {
+            IA = 1;
+            break;
+        }
+    }
+    dict* d = create();
+    int joueur = 1;
+    while (joueur != 0 & !gagnant(jeu,1) && !gagnant(jeu,2)){
+        afficher(jeu);
+        if (joueur == IA){
+            int i = strategie_optimale(jeu,d);
+            cln = i%n;
+            lgn = i/n;
+            printf("Le bot joue ligne %d et colonne %d\n",lgn,cln);
+            jouer_coup(jeu,cln,lgn);
+        } else {
+            printf("A vous de jouer\n");
+            printf("Saisir ligne colonne :\n");
+            scanf("%d %d",&lgn,&cln);
+            if (cln  < 0 || cln >= jeu->n || lgn < 0 || lgn > jeu->n){
+                printf("Out of bounds");
+            } else {
+                jouer_coup(jeu,cln,lgn);
+            }
+        }
+        joueur = joueur_courant(jeu);
+    }
+    afficher(jeu);
+    if (gagnant(jeu,IA)) printf("Le bot a gagné");
+    else if (gagnant(jeu,3 - IA)) printf("Vous avez gagné");
+    else printf("match nul, chanceux");
+    liberer_jeu(jeu);
+    dict_free(d);
+}
 
 int main(void){
     return 0;
