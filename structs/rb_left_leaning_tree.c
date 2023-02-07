@@ -256,6 +256,10 @@ node* remove_key(node* n,datatype key){
     return balancing(n);
 }
 
+void rb_remove(rb_tree* t,datatype key){
+    t->root = remove_key(t->root,key);
+}
+
 void delete_node(node* n){
     if (n == NULL) return;
     if (n->left) delete_node(n->left);
