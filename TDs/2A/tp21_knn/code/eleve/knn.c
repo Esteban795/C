@@ -1,4 +1,4 @@
-#include "knn.h"
+#include "../headers/knn.h"
 
 // Les  sont là pour éviter les avertissements dans les fonctions que
 // vous n'avez pas encore écrites. Il faut les enlever au moment d'écrire
@@ -93,15 +93,29 @@ mnist_label_t knn_weighted_majority(mnist_dataset_t dataset, mnist_picture_t can
 double* knn_confusion_matrix(knn_classifier_t classifier, mnist_dataset_t training, mnist_dataset_t testing, unsigned k, bool need_tree){
     mnist_label_t diff_label = training.max_label - training.min_label + 1;
 
+    kdtree_t* tree = NULL;
+    if (need_tree){
+        tree = malloc(sizeof(kdtree_t));
+        *tree = kdtree_build(training);
+    }
+
     unsigned* confusion_matrix = malloc(sizeof(unsigned) * diff_label * diff_label); //row major matrix
     for (int i = 0; i < diff_label * diff_label;i++){
         confusion_matrix[i] = 0;
     }
 
     unsigned* tested_labels = malloc(sizeof(unsigned) * diff_label);
+    for (mnist_label_t i = 0; i < diff_label;i++){
+        tested_labels[i] = 0;
+    }
     for (int i = 0; i < testing.case_num;i++){
         mnist_label_t test_label = testing.cases[i].label;
-        mnist_case_t** kclosest = knn_kclosest(training,testing.cases[i].picture,k);
+        mnist_case_t** kclosest;
+        if (need_tree) {
+            kclosest = kdtree_knn(*tree,testing.cases[i].picture, training.height * training.width, k);
+        } else {
+            kclosest = knn_kclosest(training,testing.cases[i].picture,k);
+        }
         mnist_label_t predicted = classifier(training,testing.cases[i].picture,kclosest,k);
 
         confusion_matrix[test_label * diff_label + predicted] += 1;
@@ -111,8 +125,13 @@ double* knn_confusion_matrix(knn_classifier_t classifier, mnist_dataset_t traini
 
     double* normalized_cm = malloc(sizeof(float) * diff_label * diff_label);
     for (int i = 0; i < diff_label;i++){
-        normalized_cm[i] = confusion_matrix[i]
+        normalized_cm[i] = (double)confusion_matrix[i] / (double)tested_labels[i / diff_label];
     }
+    free(confusion_matrix);
+    free(tested_labels);
 
-
+    if (tree != NULL) {
+        free(tree);
+    }
+    return normalized_cm;
 }
