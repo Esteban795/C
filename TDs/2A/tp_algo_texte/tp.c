@@ -55,10 +55,10 @@ int boyer_moore(char* m,char* t){
 
     int** tab = build_table(m,len_m);
     int nb_occs = 0;
-    for (int i = 0; i < len_t - len_m;i++){
+    for (int i = 0; i < len_t - len_m;){
         int k = 0;
         for (int j = len_m - 1; j >= 0;j--){
-            u_int8_t c = t[i + j];
+            unsigned char c = t[i + j];
             if (c != m[j]) {
                 k = j - tab[j][c];
                 break;
@@ -67,7 +67,7 @@ int boyer_moore(char* m,char* t){
         if (k == 0){
             printf("On a une occurence en position %d\n",i);
             nb_occs++;
-            continue;
+            k = 1;
         }
         i += k;
     }
@@ -81,3 +81,5 @@ int main(void){
     printf("On a %d occurences\n",boyer_moore(motif,txt));
     return 0;
 } 
+
+// cc tp.c -o tp -Wall -Wextra -Wvla -fsanitize=address
