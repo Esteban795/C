@@ -264,7 +264,17 @@ bool accept(nfa_t a, char *s, set_t *s1, set_t *s2){
     return a.final->last_set == s1->id;
 }
 
-void match_stream(nfa_t a, FILE *in);
+void match_stream(nfa_t a, FILE *in){
+    char line[MAX_LINE_LENGTH + 1];
+    set_t* s1 = empty_set(a.n,0);
+    set_t* s2 = empty_set(a.n,1);
+    while (fgets(line,MAX_LINE_LENGTH,in) != NULL){
+        if (accept(a,line,s1,s2)) printf("%s",line);
+        s1->id++;
+    }
+    set_free(s1);
+    set_free(s2);
+}
 
 int main(int argc, char* argv[]){
     assert(argc >= 2);
