@@ -1,8 +1,6 @@
-type ngrammes = {
-  htbl : (string, float array) Hashtbl.t
-}
-
 let max_var = 128
+
+type ngrammes = (string,int array) Hashtbl.t
 
 let histogramme (target : string) (k : int) (texte : string) = 
   let histo = Array.make max_var 0 in 
@@ -24,7 +22,7 @@ let create_kgram htbl k texte =
       end
   done;;
 
-let construire_n_grammes (texte : string) (n : int) : ((string,int array) Hashtbl.t) = 
+let construire_n_grammes (texte : string) (n : int) : (ngrammes)= 
   let range = ref 0 in 
   let ng = Hashtbl.create n in
   for k = 1 to n - !range do
@@ -33,13 +31,15 @@ let construire_n_grammes (texte : string) (n : int) : ((string,int array) Hashtb
   ng
 
 
-let choisir_aleatoire (htbl : (string,int array) Hashtbl.t) (target : string) =
+let choisir_aleatoire (htbl : ngrammes) (target : string) =
   let occs = Hashtbl.find htbl target in 
   let total = ref 0 in
   for i = 0 to max_var - 1 do
     total := !total + occs.(i)
   done;
-  let n = ref (Random.int !total) in 
+  Printf.printf "Total vaut : %d\n" !total;
+  let n = ref (Random.int (!total) + 1) in 
+  Printf.printf "n vaut %d\n" !n;
   let index = ref 0 in 
   for i = 0 to max_var - 1 do 
     if !n >= occs.(i) then 
@@ -48,17 +48,22 @@ let choisir_aleatoire (htbl : (string,int array) Hashtbl.t) (target : string) =
       n := !n - occs.(i)
       end
   done;
-  !index
+  !index;;
 
 let print_entry s arr = 
-  let n = Array.length arr in 
-  Printf.printf "String %s : " s;
-  for i = 0 to n - 1 do 
+  Printf.printf "String %s : \n" s;
+  for i = 0 to max_var - 1 do 
     Printf.printf "%d " arr.(i)
   done;
-  Printf.printf "\n"
+  Printf.printf "\n\n";;
+
+let print_table (htbl : ngrammes) = 
+  Hashtbl.iter (fun k v -> print_entry k v) htbl
 
 let _ = 
   let char_test = "test" in 
+  let target = "te" in
   let htbl = construire_n_grammes char_test 3 in 
-  Hashtbl.iter (fun key arr -> print_entry key arr) htbl
+  print_table htbl;
+  let choix = choisir_aleatoire htbl target in 
+  Printf.printf "Le choix de l'algo est %d\n" (choix)
