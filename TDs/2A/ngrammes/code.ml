@@ -10,7 +10,6 @@ let histogramme (target : string) (k : int) (texte : string) =
   done;
   histo
 
-
 let create_kgram htbl k texte =
   let len_texte = String.length texte in
   for i = 0 to len_texte - k do 
@@ -22,30 +21,26 @@ let create_kgram htbl k texte =
       end
   done;;
 
-let construire_n_grammes (texte : string) (n : int) : (ngrammes)= 
-  let range = ref 0 in 
+let construire_n_grammes (texte : string) (n : int) : (ngrammes) = 
   let ng = Hashtbl.create n in
-  for k = 1 to n - !range do
+  for k = 1 to n do
     create_kgram ng k texte
   done;
   ng
 
-
 let choisir_aleatoire (htbl : ngrammes) (target : string) =
   let occs = Hashtbl.find htbl target in 
-  let total = ref 0 in
-  for i = 0 to max_var - 1 do
-    total := !total + occs.(i)
-  done;
-  Printf.printf "Total vaut : %d\n" !total;
-  let n = ref (Random.int (!total) + 1) in 
-  Printf.printf "n vaut %d\n" !n;
+  let total_occs = ref (Array.fold_left (+) 0 occs) in 
+  let n = ref (Random.int (!total_occs + 1)) in 
+  if !n = 0 then n := 1;
   let index = ref 0 in 
+  let d = ref false in 
   for i = 0 to max_var - 1 do 
-    if !n >= occs.(i) then 
-      begin 
-      incr index;
-      n := !n - occs.(i)
+    n := !n - occs.(i);
+    if !n <= 0 && not !d then 
+      begin
+        d := true;
+        index := i
       end
   done;
   !index;;
@@ -61,9 +56,10 @@ let print_table (htbl : ngrammes) =
   Hashtbl.iter (fun k v -> print_entry k v) htbl
 
 let _ = 
-  let char_test = "test" in 
+  Random.self_init ();
+  let char_test = "testeatettes" in 
   let target = "te" in
   let htbl = construire_n_grammes char_test 3 in 
-  print_table htbl;
+  (* print_table htbl; *)
   let choix = choisir_aleatoire htbl target in 
-  Printf.printf "Le choix de l'algo est %d\n" (choix)
+  Printf.printf "Le choix de l'algo est %c (%d)\n" (char_of_int choix) choix
