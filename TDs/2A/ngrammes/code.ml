@@ -1,3 +1,6 @@
+Printexc.record_backtrace true;;
+
+
 let max_var = 128
 
 type ngrammes = (string,int array) Hashtbl.t
@@ -45,6 +48,28 @@ let choisir_aleatoire (htbl : ngrammes) (target : string) =
   done;
   !index;;
 
+
+let prediction (modele : ngrammes) ng = 
+  let k = ref (String.length ng) in 
+  let kg = ref ng in 
+  while not (Hashtbl.mem modele !kg) do 
+    decr k;
+    kg := String.sub !kg 1 !k
+  done;
+  char_of_int (choisir_aleatoire modele !kg)
+
+  let generation_auto modele _N graine taille =
+    let gen = ref graine in
+    let len = ref (String.length graine) in
+    while !len < taille do
+        let m = min !len _N in
+        let ngramme = String.sub !gen (!len - m) m in
+        gen := !gen ^ (String.make 1 (prediction modele ngramme));
+        incr len
+    done;
+    !gen
+
+
 let print_entry s arr = 
   Printf.printf "String %s : \n" s;
   for i = 0 to max_var - 1 do 
@@ -56,10 +81,9 @@ let print_table (htbl : ngrammes) =
   Hashtbl.iter (fun k v -> print_entry k v) htbl
 
 let _ = 
+  
   Random.self_init ();
-  let char_test = "testeatettes" in 
-  let target = "te" in
-  let htbl = construire_n_grammes char_test 3 in 
-  (* print_table htbl; *)
-  let choix = choisir_aleatoire htbl target in 
-  Printf.printf "Le choix de l'algo est %c (%d)\n" (char_of_int choix) choix
+  let char_test = "Bonjour, comment allez-vous ? Ca va, ca va aller bien mieux." in 
+  let htbl = construire_n_grammes char_test 2 in 
+  (* Printf.printf "Prediction pour 'Bonjour' : %c\n" (prediction htbl "all") *)
+  Printf.printf "Resultat de la génération aléatoire : \n%s" (generation_auto htbl 2 "Bonjour" 1000)
