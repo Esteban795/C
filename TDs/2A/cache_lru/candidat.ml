@@ -19,25 +19,38 @@ type lru = {
   }
 
 let nouveau_noeud x = 
-  Some 
-  {donnee = x;
+  {
+    donnee = x;
     prec = None;
     suiv = None
   }
 
   
-let ajout_debut (lst : liste_chainee) x = 
+let ajout_debut (lst : liste_chainee) (x : int) = 
   let noeud = nouveau_noeud x in
   match lst.debut with 
   | None -> (*la liste chaînée est complètement vide*)
-    lst.debut <- noeud;
-    lst.fin <- noeud        
+    lst.debut <- Some noeud;
+    lst.fin <- Some noeud        
   | Some m -> 
-    noeud.suiv <- lst.debut;
-    lst.debut.prec <- noeud;
-    lst.debut <- noeud;
+    noeud.suiv <- Some m;
+    m.prec <- Some noeud;
+    lst.debut <- Some noeud
   
-let suppression_maillon (lst : liste_chainee) (m : maillon) = 
+let suppression_maillon (lst : liste_chainee) (m : maillon) =
+  match lst.debut, lst.fin with 
+  | None, None -> ()
+  | Some deb, Some f when deb = f -> 
+      if deb = m then 
+        begin 
+          lst.fin <- None;
+          lst.debut <- None;
+        end
+  | _ ->
+    let prec = Option.get m.prec in 
+    let suiv = Option.get m.suiv in 
+    prec.suiv <- Some suiv;
+    suiv.prec <- Some prec
   
 
 
