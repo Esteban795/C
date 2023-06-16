@@ -67,7 +67,6 @@ let auto_generate model n seed generated_len =
   done;
   !gen
 
-
 let print_htbl_entry s arr = 
   Printf.printf "String %s : \n" s;
   for i = 0 to max_var - 1 do 
@@ -75,12 +74,21 @@ let print_htbl_entry s arr =
   done;
   Printf.printf "\n\n";;
 
-let print_table (htbl : model) = 
+let print_htable (htbl : model) = 
   Hashtbl.iter (fun k v -> print_htbl_entry k v) htbl
+
+let read_seed filename = 
+  let f = open_in filename in 
+  let seed = really_input_string f (in_channel_length f) in 
+  close_in f;
+  seed
 
 let _ = 
   Random.self_init ();
-  let char_test = "Bonjour, comment allez-vous ? Ca va, ca va aller bien mieux." in 
-  let model = build_n_gram char_test 3 in
-  (* Printf.printf "Prediction pour 'Bonjour' : %c\n" (prediction htbl "all") *)
-  Printf.printf "Resultat de la génération aléatoire : \n%s" (auto_generate model 4 "Bonjour" 1000)
+  let path = Sys.argv.(1) in 
+  let seed = read_seed path in 
+  let n = int_of_string Sys.argv.(2) in 
+  let start = Sys.argv.(3) in
+  let len = int_of_string Sys.argv.(4) in  
+  let model = build_n_gram seed n in
+  Printf.printf "Auto generated text : \n%s" (auto_generate model n start len)
