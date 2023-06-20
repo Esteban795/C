@@ -51,8 +51,55 @@ let suppression_maillon (lst : liste_chainee) (m : maillon) =
     let suiv = Option.get m.suiv in 
     prec.suiv <- Some suiv;
     suiv.prec <- Some prec
-  
 
+let suppression_fin lst =
+  match lst.fin with
+  | None -> ()
+  | Some e -> 
+    lst.fin <- e.prec;
+    begin 
+      match lst.fin with
+      | None -> lst.debut <- None
+      | Some f -> f.suiv <- None
+    end
+
+let initialiser_lru capa f = 
+  let dll = {debut = None ; fin = None} in 
+  {
+    liste = dll;
+    hachage = Hashtbl.create capa;
+    mmu = f;
+    longueur = 0;
+    capacite = capa
+  }
+
+
+let charger cache k = 
+  let v,h = 
+    match Hashtbl.find_opt cache.hachage k with 
+    | None -> cache.mmu k,None
+    |Some (v,h) -> v,h 
+  in
+  begin 
+    match h with 
+    |None -> 
+      if cache.longueur < cache.capacite - 1 then cache.longueur <- cache.longueur + 1
+      else 
+        begin 
+          match cache.liste.fin with 
+          | None -> ()
+          | Some l ->
+            Hashtbl.remove cache.hachage l.donnee;
+            suppression_fin cache.liste;
+            cache.longueur <- cache.longueur - 1;
+        end
+    | Some c ->
+      Hashtbl.remove cache.hachage k;
+      suppression_maillon cache.liste c
+  end;
+  ajout_debut cache.liste k;
+  Hashtbl.add cache.hachage k (v,cache.liste.debut);
+  v
 
 let chiffre = function
   | 0 -> "zero"
